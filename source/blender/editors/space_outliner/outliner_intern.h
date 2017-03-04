@@ -212,6 +212,9 @@ TreeElement *outliner_dropzone_find(const struct SpaceOops *soops, const float f
 
 void OUTLINER_OT_item_activate(struct wmOperatorType *ot);
 void OUTLINER_OT_item_openclose(struct wmOperatorType *ot);
+////////// BETTER BLENDER BEGIN: MOUSE LOCATION SHOULDN'T AFFECT RENAME OUTLINER OBJECT NAME //////////
+void OUTLINER_OT_item_rename_mouseindependent(struct wmOperatorType *ot);
+////////// BETTER BLENDER END ////////// 
 void OUTLINER_OT_item_rename(struct wmOperatorType *ot);
 void OUTLINER_OT_lib_relocate(struct wmOperatorType *ot);
 void OUTLINER_OT_lib_reload(struct wmOperatorType *ot);

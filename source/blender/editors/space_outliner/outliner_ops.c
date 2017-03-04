@@ -46,6 +46,9 @@ void outliner_operatortypes(void)
 	WM_operatortype_append(OUTLINER_OT_item_activate);
 	WM_operatortype_append(OUTLINER_OT_select_border);
 	WM_operatortype_append(OUTLINER_OT_item_openclose);
+	////////// BETTER BLENDER BEGIN: MOUSE LOCATION SHOULDN'T AFFECT RENAME OUTLINER OBJECT NAME //////////
+	WM_operatortype_append(OUTLINER_OT_item_rename_mouseindependent);
+	////////// BETTER BLENDER END ////////// 
 	WM_operatortype_append(OUTLINER_OT_item_rename);
 	WM_operatortype_append(OUTLINER_OT_operation);
 	WM_operatortype_append(OUTLINER_OT_scene_operation);

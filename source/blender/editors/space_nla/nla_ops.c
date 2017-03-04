@@ -203,19 +203,34 @@ static void nla_keymap_main(wmKeyConfig *keyconf, wmKeyMap *keymap)
 	
 	/* selection ------------------------------------------------ */
 	/* click select */
-	kmi = WM_keymap_add_item(keymap, "NLA_OT_click_select", SELECTMOUSE, KM_PRESS, 0, 0);
-	RNA_boolean_set(kmi->ptr, "extend", false);
-	kmi = WM_keymap_add_item(keymap, "NLA_OT_click_select", SELECTMOUSE, KM_PRESS, KM_SHIFT, 0);
-	RNA_boolean_set(kmi->ptr, "extend", true);
-		
-	/* select left/right */
-	kmi = WM_keymap_add_item(keymap, "NLA_OT_select_leftright", SELECTMOUSE, KM_PRESS, KM_CTRL, 0);
-	RNA_boolean_set(kmi->ptr, "extend", false);
-	RNA_enum_set(kmi->ptr, "mode", NLAEDIT_LRSEL_TEST);
-	kmi = WM_keymap_add_item(keymap, "NLA_OT_select_leftright", SELECTMOUSE, KM_PRESS, KM_CTRL | KM_SHIFT, 0);
-	RNA_boolean_set(kmi->ptr, "extend", true);
-	RNA_enum_set(kmi->ptr, "mode", NLAEDIT_LRSEL_TEST);
+	////////// BETTER BLENDER BEGIN: LEFT CLICK ANIMATION CURSOR //////////
+//	kmi = WM_keymap_add_item(keymap, "NLA_OT_click_select", SELECTMOUSE, KM_PRESS, 0, 0);
+//	RNA_boolean_set(kmi->ptr, "extend", false);
+//	kmi = WM_keymap_add_item(keymap, "NLA_OT_click_select", SELECTMOUSE, KM_PRESS, KM_SHIFT, 0);
+//	RNA_boolean_set(kmi->ptr, "extend", true);
+//		
+//	/* select left/right */
+//	kmi = WM_keymap_add_item(keymap, "NLA_OT_select_leftright", SELECTMOUSE, KM_PRESS, KM_CTRL, 0);
+//	RNA_boolean_set(kmi->ptr, "extend", false);
+//	RNA_enum_set(kmi->ptr, "mode", NLAEDIT_LRSEL_TEST);
+//	kmi = WM_keymap_add_item(keymap, "NLA_OT_select_leftright", SELECTMOUSE, KM_PRESS, KM_CTRL | KM_SHIFT, 0);
+//	RNA_boolean_set(kmi->ptr, "extend", true);
+//	RNA_enum_set(kmi->ptr, "mode", NLAEDIT_LRSEL_TEST);
 	
+	kmi = WM_keymap_add_item(keymap, "NLA_OT_click_select", ACTIONMOUSE, KM_PRESS, 0, 0);
+	RNA_boolean_set(kmi->ptr, "extend", false);
+	kmi = WM_keymap_add_item(keymap, "NLA_OT_click_select", ACTIONMOUSE, KM_PRESS, KM_SHIFT, 0);
+	RNA_boolean_set(kmi->ptr, "extend", true);
+
+	/* select left/right */
+	kmi = WM_keymap_add_item(keymap, "NLA_OT_select_leftright", ACTIONMOUSE, KM_PRESS, KM_CTRL, 0);
+	RNA_boolean_set(kmi->ptr, "extend", false);
+	RNA_enum_set(kmi->ptr, "mode", NLAEDIT_LRSEL_TEST);
+	kmi = WM_keymap_add_item(keymap, "NLA_OT_select_leftright", ACTIONMOUSE, KM_PRESS, KM_CTRL | KM_SHIFT, 0);
+	RNA_boolean_set(kmi->ptr, "extend", true);
+	RNA_enum_set(kmi->ptr, "mode", NLAEDIT_LRSEL_TEST);
+	////////// BETTER BLENDER END ////////// 
+
 	kmi = WM_keymap_add_item(keymap, "NLA_OT_select_leftright", LEFTBRACKETKEY, KM_PRESS, 0, 0);
 	RNA_boolean_set(kmi->ptr, "extend", false);
 	RNA_enum_set(kmi->ptr, "mode", NLAEDIT_LRSEL_LEFT);

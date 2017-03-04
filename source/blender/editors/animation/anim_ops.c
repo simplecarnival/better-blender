@@ -416,7 +416,14 @@ void ED_keymap_anim(wmKeyConfig *keyconf)
 	
 	/* frame management */
 	/* NOTE: 'ACTIONMOUSE' not 'LEFTMOUSE', as user may have swapped mouse-buttons */
-	WM_keymap_add_item(keymap, "ANIM_OT_change_frame", ACTIONMOUSE, KM_PRESS, 0, 0);
+
+	////////// BETTER BLENDER BEGIN: LEFT CLICK ANIMATION CURSOR //////////
+//	WM_keymap_add_item(keymap, "ANIM_OT_change_frame", ACTIONMOUSE, KM_PRESS, 0, 0);
+
+	// When you swap Blender's left and right mouse buttons, you get the obnoxious behavior where you have to right-click to change the location of the 
+	// animation cursor. This next line of code makes it so you can use the more intuitive left-click to change the location of the animation cursor.
+	WM_keymap_add_item(keymap, "ANIM_OT_change_frame", SELECTMOUSE, KM_PRESS, 0, 0);
+	////////// BETTER BLENDER END //////////
 
 	kmi = WM_keymap_add_item(keymap, "WM_OT_context_toggle", TKEY, KM_PRESS, KM_CTRL, 0);
 	RNA_string_set(kmi->ptr, "data_path", "space_data.show_seconds");

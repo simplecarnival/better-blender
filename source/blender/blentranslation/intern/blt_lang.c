@@ -238,6 +238,26 @@ void BLT_lang_init(void)
 	}
 #else
 #endif
+
+	////////// BETTER BLENDER BEGIN: LIST CHANGES IN CONSOLE WINDOW //////////
+	// List out all of the Better Blender changes in the console window -- with the newest changes first -- so I can tell if a particular feature is present on a particular installation.
+	printf("////////// BETTER BLENDER BEGIN: ALWAYS ALLOW DELETE //////////\n");
+	printf("////////// BETTER BLENDER BEGIN: NEW LIGHTS SHOULD BE PREFACED WITH \"Light - xxxxxx\" //////////\n");
+	printf("////////// BETTER BLENDER BEGIN: DUPLICATE OBJECT DUPLICATES ALL CHILDREN //////////\n");
+	printf("////////// BETTER BLENDER BEGIN: HAVE SELECT ALL/DESELECT ALL/INVERT FOR FUNCTIONS THAT DON'T HAVE IT //////////\n");
+	printf("////////// BETTER BLENDER BEGIN: SORT OUTLINER CASE INSENSITIVE //////////\n");
+	printf("////////// BETTER BLENDER BEGIN: MAKE LINKS OBJECTS TO SCENE - SELECT ALL CHILDREN BEFORE LINKING //////////\n");
+	printf("////////// BETTER BLENDER BEGIN: DELETE PARENT DELETES ALL CHILDREN //////////\n");
+	printf("////////// BETTER BLENDER BEGIN: LEFT CLICK ANIMATION CURSOR //////////\n");
+	printf("////////// BETTER BLENDER BEGIN: PARENT TOGGLE CHANGES CHILDREN //////////\n");
+	printf("////////// BETTER BLENDER BEGIN: FORBID MENU COLLAPSING //////////\n");
+	printf("////////// BETTER BLENDER BEGIN: MOUSE LOCATION SHOULDN'T AFFECT RENAME OUTLINER OBJECT NAME //////////\n");
+	printf("////////// BETTER BLENDER BEGIN: PROPERTY WINDOW SHOULD ALWAYS BE VERTICAL //////////\n");
+	printf("////////// BETTER BLENDER BEGIN: CHANGE APPLICATION HEADER TO SAY \"BETTER BLENDER\" //////////\n");
+	printf("////////// BETTER BLENDER BEGIN: MENUS SHOULD ONLY BE AT THE TOP OF A WINDOW //////////\n");
+	printf("////////// BETTER BLENDER BEGIN: OBNOXIOUS HEADERS //////////\n");
+	printf("\n");
+	////////// BETTER BLENDER END ////////// 
 }
 
 void BLT_lang_free(void)

@@ -1443,9 +1443,30 @@ void ED_area_initialize(wmWindowManager *wm, wmWindow *win, ScrArea *sa)
 		sa->type = BKE_spacetype_from_id(sa->spacetype);
 	}
 	
+	////////// BETTER BLENDER BEGIN: FORBID MENU COLLAPSING //////////
+	if (sa->flag & HEADER_NO_PULLDOWN)
+	{
+		// We ALWAYS want to have the pulldown, so remove it.
+		sa->flag = sa->flag ^ HEADER_NO_PULLDOWN;
+		ED_area_tag_refresh(sa);
+	}
+	////////// BETTER BLENDER END ////////// 
+
 	for (ar = sa->regionbase.first; ar; ar = ar->next)
-		ar->type = BKE_regiontype_from_id(sa->type, ar->regiontype);
+		////////// BETTER BLENDER BEGIN: MENUS SHOULD ONLY BE AT THE TOP OF A WINDOW //////////
+//		ar->type = BKE_regiontype_from_id(sa->type, ar->regiontype);
 	
+	{
+		if (ar->regiontype == RGN_TYPE_HEADER && ar->alignment != RGN_ALIGN_TOP)
+		{
+			ar->alignment = RGN_ALIGN_TOP;
+			ED_region_tag_redraw(ar);
+			ED_area_tag_refresh(sa);
+		}
+		ar->type = BKE_regiontype_from_id(sa->type, ar->regiontype);
+	}
+	////////// BETTER BLENDER END ////////// 
+
 	/* area sizes */
 	area_calc_totrct(sa, WM_window_pixels_x(win), WM_window_pixels_y(win));
 	
@@ -2017,7 +2038,13 @@ void ED_region_header(const bContext *C, ARegion *ar)
 	int headery = ED_area_headersize();
 
 	/* clear */
-	UI_ThemeClearColor((ED_screen_area_active(C)) ? TH_HEADER : TH_HEADERDESEL);
+	////////// BETTER BLENDER BEGIN: OBNOXIOUS HEADERS ////////// 
+//	UI_ThemeClearColor((ED_screen_area_active(C)) ? TH_HEADER : TH_HEADERDESEL);
+
+	// Because TH_HEADER is used in other spots in the code (like for track backgrounds), we need to swap these around. TH_HEADERDESEL actually means highlight.
+	UI_ThemeClearColor((ED_screen_area_active(C)) ? TH_HEADERDESEL : TH_HEADER);
+	////////// BETTER BLENDER END ////////// 
+
 	glClear(GL_COLOR_BUFFER_BIT);
 	
 	/* set view2d view matrix for scrolling (without scrollers) */

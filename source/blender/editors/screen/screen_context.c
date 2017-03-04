@@ -135,8 +135,14 @@ int ed_screen_context(const bContext *C, const char *member, bContextDataResult 
 		const bool selectable_objects = CTX_data_equals(member, "selectable_objects");
 
 		for (base = scene->base.first; base; base = base->next) {
-			if (base->lay & lay) {
-				if ((base->object->restrictflag & OB_RESTRICT_VIEW) == 0 && (base->object->restrictflag & OB_RESTRICT_SELECT) == 0) {
+			////////// BETTER BLENDER BEGIN: ALWAYS ALLOW DELETE //////////
+//			if (base->lay & lay) {
+//				if ((base->object->restrictflag & OB_RESTRICT_VIEW) == 0 && (base->object->restrictflag & OB_RESTRICT_SELECT) == 0) {
+
+			if (true) {
+				if (true) {
+					////////// BETTER BLENDER END ////////// 
+
 					if (selectable_objects)
 						CTX_data_id_list_add(result, &base->object->id);
 					else

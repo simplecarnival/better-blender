@@ -225,12 +225,19 @@ const unsigned char *UI_ThemeGetColorPtr(bTheme *btheme, int spacetype, int colo
 				case TH_HEADER:
 					cp = ts->header; break;
 				case TH_HEADERDESEL:
+					////////// BETTER BLENDER BEGIN: OBNOXIOUS HEADERS //////////
 					/* we calculate a dynamic builtin header deselect color, also for pulldowns... */
-					cp = ts->header;
-					headerdesel[0] = cp[0] > 10 ? cp[0] - 10 : 0;
-					headerdesel[1] = cp[1] > 10 ? cp[1] - 10 : 0;
-					headerdesel[2] = cp[2] > 10 ? cp[2] - 10 : 0;
-					cp = headerdesel;
+//					cp = ts->header;
+//					headerdesel[0] = cp[0] > 10 ? cp[0] - 10 : 0;
+//					headerdesel[1] = cp[1] > 10 ? cp[1] - 10 : 0;
+//					headerdesel[2] = cp[2] > 10 ? cp[2] - 10 : 0;
+//					cp = headerdesel;
+
+					// Note that we changed the meaning of TH_HEADERDESEL so it actually means the panel is being *selected*.
+					// If a panel has a mouseover, make it REALLY obvious that the panel has the focus.
+					// Use the highlighted text color to highlight the panel.
+					cp = ts->text_hi; break;
+					////////// BETTER BLENDER END ////////// 
 					break;
 				case TH_HEADER_TEXT:
 					cp = ts->header_text; break;

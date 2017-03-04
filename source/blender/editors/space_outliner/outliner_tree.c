@@ -1424,8 +1424,17 @@ static int treesort_alpha_ob(const void *v1, const void *v2)
 	if (comp == 1) return 1;
 	else if (comp == 2) return -1;
 	else if (comp == 3) {
-		comp = strcmp(x1->name, x2->name);
-		
+		////////// BETTER BLENDER BEGIN: SORT OUTLINER CASE INSENSITIVE //////////
+//		comp = strcmp(x1->name, x2->name);
+
+		comp = strcasecmp(x1->name, x2->name);
+		if (comp == 0)
+		{
+			// If the strings are the same, then sort capitalized one first followed by uncapitalized.
+			comp = strcmp(x1->name, x2->name);
+		}
+		////////// BETTER BLENDER END ////////// 
+
 		if (comp > 0) return 1;
 		else if (comp < 0) return -1;
 		return 0;

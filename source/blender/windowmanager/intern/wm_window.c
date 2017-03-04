@@ -359,13 +359,22 @@ void wm_window_title(wmWindowManager *wm, wmWindow *win)
 		/* this is set to 1 if you don't have startup.blend open */
 		if (G.save_over && G.main->name[0]) {
 			char str[sizeof(G.main->name) + 24];
-			BLI_snprintf(str, sizeof(str), "Blender%s [%s%s]", wm->file_saved ? "" : "*", G.main->name,
-			             G.main->recovered ? " (Recovered)" : "");
+			////////// BETTER BLENDER BEGIN: CHANGE APPLICATION HEADER TO SAY \"BETTER BLENDER\" //////////
+//			BLI_snprintf(str, sizeof(str), "Blender%s [%s%s]", wm->file_saved ? "" : "*", G.main->name,
+//			             G.main->recovered ? " (Recovered)" : "");
+
+			BLI_snprintf(str, sizeof(str), "Better Blender%s [%s%s]", wm->file_saved ? "" : "*", G.main->name,
+				G.main->recovered ? " (Recovered)" : "");
+			////////// BETTER BLENDER END ////////// 
 			GHOST_SetTitle(win->ghostwin, str);
 		}
-		else
-			GHOST_SetTitle(win->ghostwin, "Blender");
+		////////// BETTER BLENDER BEGIN: CHANGE APPLICATION HEADER TO SAY \"BETTER BLENDER\" //////////
+//		else
+//			GHOST_SetTitle(win->ghostwin, "Blender");
 
+		else
+			GHOST_SetTitle(win->ghostwin, "Better Blender");
+		////////// BETTER BLENDER END ////////// 
 		/* Informs GHOST of unsaved changes, to set window modified visual indicator (MAC OS X)
 		 * and to give hint of unsaved changes for a user warning mechanism
 		 * in case of OS application terminate request (e.g. OS Shortcut Alt+F4, Cmd+Q, (...), or session end) */

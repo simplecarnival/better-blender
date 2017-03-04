@@ -164,8 +164,11 @@ void INFO_OT_select_pick(wmOperatorType *ot)
 }
 
 
+////////// BETTER BLENDER BEGIN: HAVE SELECT ALL/DESELECT ALL/INVERT FOR FUNCTIONS THAT DON'T HAVE IT //////////
+//static int report_select_all_toggle_exec(bContext *C, wmOperator *UNUSED(op))
 
-static int report_select_all_toggle_exec(bContext *C, wmOperator *UNUSED(op))
+static int report_select_all_toggle_exec(bContext *C, wmOperator *op)
+////////// BETTER BLENDER END ////////// 
 {
 	SpaceInfo *sinfo = CTX_wm_space_info(C);
 	ReportList *reports = CTX_wm_reports(C);
@@ -174,24 +177,58 @@ static int report_select_all_toggle_exec(bContext *C, wmOperator *UNUSED(op))
 
 	Report *report;
 
-	for (report = reports->list.last; report; report = report->prev) {
-		if ((report->type & report_mask) && (report->flag & SELECT)) {
-			deselect = 1;
-			break;
+	////////// BETTER BLENDER BEGIN: HAVE SELECT ALL/DESELECT ALL/INVERT FOR FUNCTIONS THAT DON'T HAVE IT //////////
+//	for (report = reports->list.last; report; report = report->prev) {
+//		if ((report->type & report_mask) && (report->flag & SELECT)) {
+//			deselect = 1;
+//			break;
+//		}
+//	}
+//
+//
+//	if (deselect) {
+//		for (report = reports->list.last; report; report = report->prev)
+//			if (report->type & report_mask)
+//				report->flag &= ~SELECT;
+//	}
+//	else {
+//		for (report = reports->list.last; report; report = report->prev)
+//			if (report->type & report_mask)
+//				report->flag |= SELECT;
+//	}
+
+	int action = RNA_enum_get(op->ptr, "action");
+
+	if (action == SEL_TOGGLE || action == SEL_INVERT)
+	{
+		for (report = reports->list.last; report; report = report->prev)
+		{
+			if (report->type & report_mask)
+			{
+				if (report->flag & SELECT)
+				{
+					report->flag &= ~SELECT;
+				}
+				else
+				{
+					report->flag |= SELECT;
+				}
+			}
 		}
 	}
-
-
-	if (deselect) {
+	else if (action == SEL_DESELECT)
+	{
 		for (report = reports->list.last; report; report = report->prev)
 			if (report->type & report_mask)
 				report->flag &= ~SELECT;
 	}
-	else {
+	else // action == SEL_SELECT
+	{
 		for (report = reports->list.last; report; report = report->prev)
 			if (report->type & report_mask)
 				report->flag |= SELECT;
 	}
+	////////// BETTER BLENDER END ////////// 
 
 	ED_area_tag_redraw(CTX_wm_area(C));
 
@@ -213,6 +250,9 @@ void INFO_OT_select_all_toggle(wmOperatorType *ot)
 	/*ot->flag = OPTYPE_REGISTER;*/
 
 	/* properties */
+	////////// BETTER BLENDER BEGIN: HAVE SELECT ALL/DESELECT ALL/INVERT FOR FUNCTIONS THAT DON'T HAVE IT //////////
+	WM_operator_properties_select_all(ot);
+	////////// BETTER BLENDER END ////////// 
 }
 
 /* borderselect operator */

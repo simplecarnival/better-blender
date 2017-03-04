@@ -2314,12 +2314,33 @@ static int animchannels_deselectall_exec(bContext *C, wmOperator *op)
 	if (ANIM_animdata_get_context(C, &ac) == 0)
 		return OPERATOR_CANCELLED;
 		
-	/* 'standard' behavior - check if selected, then apply relevant selection */
-	if (RNA_boolean_get(op->ptr, "invert"))
-		ANIM_deselect_anim_channels(&ac, ac.data, ac.datatype, false, ACHANNEL_SETFLAG_INVERT);
-	else
-		ANIM_deselect_anim_channels(&ac, ac.data, ac.datatype, true, ACHANNEL_SETFLAG_ADD);
+	////////// BETTER BLENDER BEGIN: HAVE SELECT ALL/DESELECT ALL/INVERT FOR FUNCTIONS THAT DON'T HAVE IT //////////		
+//	/* 'standard' behavior - check if selected, then apply relevant selection */
+//	if (RNA_boolean_get(op->ptr, "invert"))
+//		ANIM_deselect_anim_channels(&ac, ac.data, ac.datatype, false, ACHANNEL_SETFLAG_INVERT);
+//	else
+//		ANIM_deselect_anim_channels(&ac, ac.data, ac.datatype, true, ACHANNEL_SETFLAG_ADD);
 	
+	int action = RNA_enum_get(op->ptr, "action");
+
+	if (action == SEL_TOGGLE)
+	{
+		ANIM_deselect_anim_channels(&ac, ac.data, ac.datatype, false, ACHANNEL_SETFLAG_TOGGLE);
+	}
+	else if (action == SEL_INVERT)
+	{
+		ANIM_deselect_anim_channels(&ac, ac.data, ac.datatype, false, ACHANNEL_SETFLAG_INVERT);
+	}
+	else if (action == SEL_DESELECT)
+	{
+		ANIM_deselect_anim_channels(&ac, ac.data, ac.datatype, true, ACHANNEL_SETFLAG_CLEAR);
+	}
+	else // action == SEL_SELECT
+	{
+		ANIM_deselect_anim_channels(&ac, ac.data, ac.datatype, true, ACHANNEL_SETFLAG_ADD);
+	}
+	////////// BETTER BLENDER END ////////// 
+
 	/* send notifier that things have changed */
 	WM_event_add_notifier(C, NC_ANIMATION | ND_ANIMCHAN | NA_SELECTED, NULL);
 	
@@ -2341,7 +2362,11 @@ static void ANIM_OT_channels_select_all_toggle(wmOperatorType *ot)
 	ot->flag = OPTYPE_REGISTER | OPTYPE_UNDO;
 	
 	/* props */
-	ot->prop = RNA_def_boolean(ot->srna, "invert", false, "Invert", "");
+	////////// BETTER BLENDER BEGIN: HAVE SELECT ALL/DESELECT ALL/INVERT FOR FUNCTIONS THAT DON'T HAVE IT //////////
+//	ot->prop = RNA_def_boolean(ot->srna, "invert", false, "Invert", "");
+
+	WM_operator_properties_select_all(ot);
+	////////// BETTER BLENDER END ////////// 
 }
 
 /* ******************** Borderselect Operator *********************** */

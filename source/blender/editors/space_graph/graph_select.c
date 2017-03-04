@@ -161,12 +161,28 @@ static int graphkeys_deselectall_exec(bContext *C, wmOperator *op)
 	 */
 	ale_active = get_active_fcurve_channel(&ac);
 	
-	/* 'standard' behavior - check if selected, then apply relevant selection */
-	if (RNA_boolean_get(op->ptr, "invert"))
+	////////// BETTER BLENDER BEGIN: HAVE SELECT ALL/DESELECT ALL/INVERT FOR FUNCTIONS THAT DON'T HAVE IT //////////
+//	/* 'standard' behavior - check if selected, then apply relevant selection */
+//	if (RNA_boolean_get(op->ptr, "invert"))
+//		deselect_graph_keys(&ac, 0, SELECT_INVERT, true);
+//	else
+//		deselect_graph_keys(&ac, 1, SELECT_ADD, true);
+
+	int action = RNA_enum_get(op->ptr, "action");
+
+	if (action == SEL_TOGGLE || action == SEL_INVERT) {
 		deselect_graph_keys(&ac, 0, SELECT_INVERT, true);
-	else
-		deselect_graph_keys(&ac, 1, SELECT_ADD, true);
-	
+	}
+	else if (action == SEL_DESELECT)
+	{
+		deselect_graph_keys(&ac, 1, SELECT_SUBTRACT, true);
+	}
+	else // action == SEL_SELECT
+	{
+		deselect_graph_keys(&ac, 0, SELECT_ADD, true);
+	}
+	////////// BETTER BLENDER END ////////// 
+
 	/* restore active F-Curve... */
 	if (ale_active) {
 		FCurve *fcu = (FCurve *)ale_active->data;
@@ -201,7 +217,11 @@ void GRAPH_OT_select_all_toggle(wmOperatorType *ot)
 	ot->flag = OPTYPE_REGISTER | OPTYPE_UNDO;
 	
 	/* props */
-	ot->prop = RNA_def_boolean(ot->srna, "invert", 0, "Invert", "");
+	////////// BETTER BLENDER BEGIN: HAVE SELECT ALL/DESELECT ALL/INVERT FOR FUNCTIONS THAT DON'T HAVE IT //////////
+//	ot->prop = RNA_def_boolean(ot->srna, "invert", 0, "Invert", "");
+
+	WM_operator_properties_select_all(ot);
+	////////// BETTER BLENDER END //////////
 }
 
 /* ******************** Border Select Operator **************************** */

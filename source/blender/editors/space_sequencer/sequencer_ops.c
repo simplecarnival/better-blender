@@ -245,7 +245,11 @@ void sequencer_keymap(wmKeyConfig *keyconf)
 	}
 
 	/* Mouse selection, a bit verbose :/ */
-	kmi = WM_keymap_add_item(keymap, "SEQUENCER_OT_select", SELECTMOUSE, KM_PRESS, 0, 0);
+	////////// BETTER BLENDER BEGIN: LEFT CLICK ANIMATION CURSOR //////////
+//	kmi = WM_keymap_add_item(keymap, "SEQUENCER_OT_select", SELECTMOUSE, KM_PRESS, 0, 0);
+
+	kmi = WM_keymap_add_item(keymap, "SEQUENCER_OT_select", ACTIONMOUSE, KM_PRESS, 0, 0);
+	////////// BETTER BLENDER END ////////// 
 	RNA_boolean_set(kmi->ptr, "extend", false);
 	RNA_boolean_set(kmi->ptr, "linked_handle", false);
 	RNA_enum_set(kmi->ptr, "left_right", SEQ_SELECT_LR_NONE);

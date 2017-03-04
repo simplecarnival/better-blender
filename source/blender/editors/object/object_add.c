@@ -901,15 +901,27 @@ void OBJECT_OT_drop_named_image(wmOperatorType *ot)
 
 static const char *get_lamp_defname(int type)
 {
+	////////// BETTER BLENDER BEGIN: NEW LIGHTS SHOULD BE PREFACED WITH \"Light - xxxxxx\" //////////
+//	switch (type) {
+//		case LA_LOCAL: return CTX_DATA_(BLT_I18NCONTEXT_ID_LAMP, "Point");
+//		case LA_SUN: return CTX_DATA_(BLT_I18NCONTEXT_ID_LAMP, "Sun");
+//		case LA_SPOT: return CTX_DATA_(BLT_I18NCONTEXT_ID_LAMP, "Spot");
+//		case LA_HEMI: return CTX_DATA_(BLT_I18NCONTEXT_ID_LAMP, "Hemi");
+//		case LA_AREA: return CTX_DATA_(BLT_I18NCONTEXT_ID_LAMP, "Area");
+//		default:
+//			return CTX_DATA_(BLT_I18NCONTEXT_ID_LAMP, "Lamp");
+//	}
+
 	switch (type) {
-		case LA_LOCAL: return CTX_DATA_(BLT_I18NCONTEXT_ID_LAMP, "Point");
-		case LA_SUN: return CTX_DATA_(BLT_I18NCONTEXT_ID_LAMP, "Sun");
-		case LA_SPOT: return CTX_DATA_(BLT_I18NCONTEXT_ID_LAMP, "Spot");
-		case LA_HEMI: return CTX_DATA_(BLT_I18NCONTEXT_ID_LAMP, "Hemi");
-		case LA_AREA: return CTX_DATA_(BLT_I18NCONTEXT_ID_LAMP, "Area");
-		default:
-			return CTX_DATA_(BLT_I18NCONTEXT_ID_LAMP, "Lamp");
+	case LA_LOCAL: return CTX_DATA_(BLT_I18NCONTEXT_ID_LAMP, "Light - Point");
+	case LA_SUN: return CTX_DATA_(BLT_I18NCONTEXT_ID_LAMP, "Light - Sun");
+	case LA_SPOT: return CTX_DATA_(BLT_I18NCONTEXT_ID_LAMP, "Light - Spot");
+	case LA_HEMI: return CTX_DATA_(BLT_I18NCONTEXT_ID_LAMP, "Light - Hemi");
+	case LA_AREA: return CTX_DATA_(BLT_I18NCONTEXT_ID_LAMP, "Light - Area");
+	default:
+		return CTX_DATA_(BLT_I18NCONTEXT_ID_LAMP, "Light - Lamp");
 	}
+
 }
 
 static int object_lamp_add_exec(bContext *C, wmOperator *op)
@@ -1124,6 +1136,29 @@ void ED_base_object_free_and_unlink(Main *bmain, Scene *scene, Base *base)
 	DAG_id_type_tag(bmain, ID_OB);
 }
 
+////////// BETTER BLENDER BEGIN: DELETE PARENT DELETES ALL CHILDREN //////////
+static bool select_grouped_children(bContext *C, Object *ob, const bool recursive)
+{
+	bool changed = false;
+
+	CTX_DATA_BEGIN(C, Base *, base, selectable_bases)
+	{
+		if (ob == base->object->parent) {
+			if (!(base->flag & SELECT)) {
+				//				ED_base_object_select(base, BA_SELECT); // Don't do this...see the next line for why.
+				base->flag |= SELECT; // Select even the stuff that isn't supposed to be selectable (because the select icon in the outliner is turned off).
+				changed = true;
+			}
+
+			if (recursive)
+				changed |= select_grouped_children(C, base->object, 1);
+		}
+	}
+	CTX_DATA_END;
+	return changed;
+}
+////////// BETTER BLENDER END ////////// 
+
 static int object_delete_exec(bContext *C, wmOperator *op)
 {
 	Main *bmain = CTX_data_main(C);
@@ -1135,6 +1170,14 @@ static int object_delete_exec(bContext *C, wmOperator *op)
 
 	if (CTX_data_edit_object(C)) 
 		return OPERATOR_CANCELLED;
+
+	////////// BETTER BLENDER BEGIN: DELETE PARENT DELETES ALL CHILDREN //////////
+	CTX_DATA_BEGIN(C, Base *, base, selected_bases)
+	{
+		select_grouped_children(C, base->object, 1);
+	}
+	CTX_DATA_END;
+	////////// BETTER BLENDER END ////////// 
 
 	CTX_DATA_BEGIN (C, Base *, base, selected_bases)
 	{
@@ -2176,6 +2219,14 @@ static int duplicate_exec(bContext *C, wmOperator *op)
 
 	BKE_main_id_clear_newpoins(bmain);
 	clear_sca_new_poins();  /* sensor/contr/act */
+
+	////////// BETTER BLENDER BEGIN: DUPLICATE OBJECT DUPLICATES ALL CHILDREN //////////
+	CTX_DATA_BEGIN(C, Base *, base, selected_bases)
+	{
+		select_grouped_children(C, base->object, 1);
+	}
+	CTX_DATA_END;
+	////////// BETTER BLENDER END ////////// 
 
 	CTX_DATA_BEGIN (C, Base *, base, selected_bases)
 	{

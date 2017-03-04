@@ -1453,6 +1453,28 @@ Base *ED_object_scene_link(Scene *scene, Object *ob)
 	return base;
 }
 
+////////// BETTER BLENDER BEGIN: MAKE LINKS OBJECTS TO SCENE - SELECT ALL CHILDREN BEFORE LINKING //////////
+static bool select_grouped_children(bContext *C, Object *ob, const bool recursive)
+{
+	bool changed = false;
+
+	CTX_DATA_BEGIN(C, Base *, base, selectable_bases)
+	{
+		if (ob == base->object->parent) {
+			if (!(base->flag & SELECT)) {
+				ED_base_object_select(base, BA_SELECT);
+				changed = true;
+			}
+
+			if (recursive)
+				changed |= select_grouped_children(C, base->object, 1);
+		}
+	}
+	CTX_DATA_END;
+	return changed;
+}
+////////// BETTER BLENDER END ////////// 
+
 static int make_links_scene_exec(bContext *C, wmOperator *op)
 {
 	Scene *scene_to = BLI_findlink(&CTX_data_main(C)->scene, RNA_enum_get(op->ptr, "scene"));
@@ -1471,6 +1493,14 @@ static int make_links_scene_exec(bContext *C, wmOperator *op)
 		BKE_report(op->reports, RPT_ERROR, "Cannot link objects into a linked scene");
 		return OPERATOR_CANCELLED;
 	}
+
+	////////// BETTER BLENDER BEGIN: MAKE LINKS OBJECTS TO SCENE - SELECT ALL CHILDREN BEFORE LINKING //////////
+	CTX_DATA_BEGIN(C, Base *, base, selected_bases)
+	{
+		select_grouped_children(C, base->object, 1);
+	}
+	CTX_DATA_END;
+	////////// BETTER BLENDER END ////////// 
 
 	CTX_DATA_BEGIN (C, Base *, base, selected_bases)
 	{

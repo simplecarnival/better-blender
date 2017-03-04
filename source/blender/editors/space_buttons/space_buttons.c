@@ -139,6 +139,9 @@ static void buttons_main_region_draw(const bContext *C, ARegion *ar)
 {
 	/* draw entirely, view changes should be handled here */
 	SpaceButs *sbuts = CTX_wm_space_buts(C);
+	////////// BETTER BLENDER BEGIN: PROPERTY WINDOW SHOULD ALWAYS BE VERTICAL //////////
+	sbuts->align = BUT_VERTICAL;
+	////////// BETTER BLENDER END ////////// 
 	const bool vertical = (sbuts->align == BUT_VERTICAL);
 
 	buttons_context_compute(C, sbuts);

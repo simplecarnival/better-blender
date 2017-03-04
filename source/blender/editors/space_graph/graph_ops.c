@@ -492,41 +492,86 @@ static void graphedit_keymap_keyframes(wmKeyConfig *keyconf, wmKeyMap *keymap)
 	/* NOTE: 'ACTIONMOUSE' not 'LEFTMOUSE', as user may have swapped mouse-buttons
 	 * This keymap is supposed to override ANIM_OT_change_frame, which does the same except it doesn't do y-values
 	 */
-	WM_keymap_add_item(keymap, "GRAPH_OT_cursor_set", ACTIONMOUSE, KM_PRESS, 0, 0);
+	////////// BETTER BLENDER BEGIN: LEFT CLICK ANIMATION CURSOR //////////
+//	WM_keymap_add_item(keymap, "GRAPH_OT_cursor_set", ACTIONMOUSE, KM_PRESS, 0, 0);
 	
-	
+	WM_keymap_add_item(keymap, "GRAPH_OT_cursor_set", SELECTMOUSE, KM_PRESS, 0, 0);
+	////////// BETTER BLENDER END //////////
+
 	/* graph_select.c - selection tools */
 	/* click-select: keyframe (replace)  */
-	kmi = WM_keymap_add_item(keymap, "GRAPH_OT_clickselect", SELECTMOUSE, KM_PRESS, 0, 0);
+	////////// BETTER BLENDER BEGIN: LEFT CLICK ANIMATION CURSOR //////////
+//	kmi = WM_keymap_add_item(keymap, "GRAPH_OT_clickselect", SELECTMOUSE, KM_PRESS, 0, 0);
+//	RNA_boolean_set(kmi->ptr, "extend", false);
+//	RNA_boolean_set(kmi->ptr, "curves", false);
+//	RNA_boolean_set(kmi->ptr, "column", false);
+//	/* click-select: all keyframes on same frame (replace) */
+//	kmi = WM_keymap_add_item(keymap, "GRAPH_OT_clickselect", SELECTMOUSE, KM_PRESS, KM_ALT, 0);
+//	RNA_boolean_set(kmi->ptr, "extend", false);
+//	RNA_boolean_set(kmi->ptr, "curves", false);
+//	RNA_boolean_set(kmi->ptr, "column", true);
+//	/* click-select: keyframe (add) */
+//	kmi = WM_keymap_add_item(keymap, "GRAPH_OT_clickselect", SELECTMOUSE, KM_PRESS, KM_SHIFT, 0);
+//	RNA_boolean_set(kmi->ptr, "extend", true);
+//	RNA_boolean_set(kmi->ptr, "curves", false);
+//	RNA_boolean_set(kmi->ptr, "column", false);
+//	/* click-select: all keyframes on same frame (add) */
+//	kmi = WM_keymap_add_item(keymap, "GRAPH_OT_clickselect", SELECTMOUSE, KM_PRESS, KM_ALT | KM_SHIFT, 0);
+//	RNA_boolean_set(kmi->ptr, "extend", true);
+//	RNA_boolean_set(kmi->ptr, "curves", false);
+//	RNA_boolean_set(kmi->ptr, "column", true);
+//	/* click-select: all keyframes in same curve (replace) */
+//	kmi = WM_keymap_add_item(keymap, "GRAPH_OT_clickselect", SELECTMOUSE, KM_PRESS, KM_CTRL | KM_ALT, 0);
+//	RNA_boolean_set(kmi->ptr, "extend", false);
+//	RNA_boolean_set(kmi->ptr, "curves", true);
+//	RNA_boolean_set(kmi->ptr, "column", false);
+//	/* click-select: all keyframes in same curve (add) */
+//	kmi = WM_keymap_add_item(keymap, "GRAPH_OT_clickselect", SELECTMOUSE, KM_PRESS, KM_CTRL | KM_ALT | KM_SHIFT, 0);
+//	RNA_boolean_set(kmi->ptr, "extend", true);
+//	RNA_boolean_set(kmi->ptr, "curves", true);
+//	RNA_boolean_set(kmi->ptr, "column", false);
+	
+
+
+	kmi = WM_keymap_add_item(keymap, "GRAPH_OT_clickselect", ACTIONMOUSE, KM_PRESS, 0, 0);
 	RNA_boolean_set(kmi->ptr, "extend", false);
 	RNA_boolean_set(kmi->ptr, "curves", false);
 	RNA_boolean_set(kmi->ptr, "column", false);
 	/* click-select: all keyframes on same frame (replace) */
-	kmi = WM_keymap_add_item(keymap, "GRAPH_OT_clickselect", SELECTMOUSE, KM_PRESS, KM_ALT, 0);
+	kmi = WM_keymap_add_item(keymap, "GRAPH_OT_clickselect", ACTIONMOUSE, KM_PRESS, KM_ALT, 0);
 	RNA_boolean_set(kmi->ptr, "extend", false);
 	RNA_boolean_set(kmi->ptr, "curves", false);
 	RNA_boolean_set(kmi->ptr, "column", true);
 	/* click-select: keyframe (add) */
-	kmi = WM_keymap_add_item(keymap, "GRAPH_OT_clickselect", SELECTMOUSE, KM_PRESS, KM_SHIFT, 0);
+	kmi = WM_keymap_add_item(keymap, "GRAPH_OT_clickselect", ACTIONMOUSE, KM_PRESS, KM_SHIFT, 0);
 	RNA_boolean_set(kmi->ptr, "extend", true);
 	RNA_boolean_set(kmi->ptr, "curves", false);
 	RNA_boolean_set(kmi->ptr, "column", false);
 	/* click-select: all keyframes on same frame (add) */
-	kmi = WM_keymap_add_item(keymap, "GRAPH_OT_clickselect", SELECTMOUSE, KM_PRESS, KM_ALT | KM_SHIFT, 0);
+	kmi = WM_keymap_add_item(keymap, "GRAPH_OT_clickselect", ACTIONMOUSE, KM_PRESS, KM_ALT | KM_SHIFT, 0);
 	RNA_boolean_set(kmi->ptr, "extend", true);
 	RNA_boolean_set(kmi->ptr, "curves", false);
 	RNA_boolean_set(kmi->ptr, "column", true);
 	/* click-select: all keyframes in same curve (replace) */
-	kmi = WM_keymap_add_item(keymap, "GRAPH_OT_clickselect", SELECTMOUSE, KM_PRESS, KM_CTRL | KM_ALT, 0);
+	kmi = WM_keymap_add_item(keymap, "GRAPH_OT_clickselect", ACTIONMOUSE, KM_PRESS, KM_CTRL | KM_ALT, 0);
 	RNA_boolean_set(kmi->ptr, "extend", false);
 	RNA_boolean_set(kmi->ptr, "curves", true);
 	RNA_boolean_set(kmi->ptr, "column", false);
 	/* click-select: all keyframes in same curve (add) */
-	kmi = WM_keymap_add_item(keymap, "GRAPH_OT_clickselect", SELECTMOUSE, KM_PRESS, KM_CTRL | KM_ALT | KM_SHIFT, 0);
+	kmi = WM_keymap_add_item(keymap, "GRAPH_OT_clickselect", ACTIONMOUSE, KM_PRESS, KM_CTRL | KM_ALT | KM_SHIFT, 0);
 	RNA_boolean_set(kmi->ptr, "extend", true);
 	RNA_boolean_set(kmi->ptr, "curves", true);
 	RNA_boolean_set(kmi->ptr, "column", false);
-	
+
+	/* click-select left/right */
+	kmi = WM_keymap_add_item(keymap, "GRAPH_OT_select_leftright", ACTIONMOUSE, KM_PRESS, KM_CTRL, 0);
+	RNA_boolean_set(kmi->ptr, "extend", false);
+	RNA_enum_set(kmi->ptr, "mode", GRAPHKEYS_LRSEL_TEST);
+	kmi = WM_keymap_add_item(keymap, "GRAPH_OT_select_leftright", ACTIONMOUSE, KM_PRESS, KM_CTRL | KM_SHIFT, 0);
+	RNA_boolean_set(kmi->ptr, "extend", true);
+	RNA_enum_set(kmi->ptr, "mode", GRAPHKEYS_LRSEL_TEST);
+	////////// BETTER BLENDER END //////////
+
 	/* click-select left/right */
 	kmi = WM_keymap_add_item(keymap, "GRAPH_OT_select_leftright", SELECTMOUSE, KM_PRESS, KM_CTRL, 0);
 	RNA_boolean_set(kmi->ptr, "extend", false);

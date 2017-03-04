@@ -271,6 +271,31 @@ static int do_outliner_item_rename(ReportList *reports, ARegion *ar, SpaceOops *
 	return 0;
 }
 
+////////// BETTER BLENDER BEGIN: MOUSE LOCATION SHOULDN'T AFFECT RENAME OUTLINER OBJECT NAME //////////
+static int outliner_item_rename_mouseindependent(bContext *C, wmOperator *UNUSED(op), const wmEvent *event)
+{
+	ARegion *ar = CTX_wm_region(C);
+	SpaceOops *soops = CTX_wm_space_outliner(C);
+	TreeElement *te;
+	float fmval[2];
+
+	for (te = soops->tree.first; te; te = te->next)
+	{
+		if (te->idcode == ID_OB) // It's an object (i.e. it's not the World object)
+		{
+			if (te->flag & SELECT) // It's selected.
+			{
+				TreeStoreElem *tselem = TREESTORE(te);
+				ReportList *reports = CTX_wm_reports(C); // XXX
+				do_item_rename(ar, te, tselem, reports);
+				return OPERATOR_FINISHED;
+			}
+		}
+	}
+	return OPERATOR_PASS_THROUGH;
+}
+////////// BETTER BLENDER END ////////// 
+
 static int outliner_item_rename(bContext *C, wmOperator *op, const wmEvent *event)
 {
 	ARegion *ar = CTX_wm_region(C);
@@ -291,6 +316,16 @@ static int outliner_item_rename(bContext *C, wmOperator *op, const wmEvent *even
 	return changed ? OPERATOR_FINISHED : OPERATOR_PASS_THROUGH;
 }
 
+////////// BETTER BLENDER BEGIN: MOUSE LOCATION SHOULDN'T AFFECT RENAME OUTLINER OBJECT NAME //////////
+void OUTLINER_OT_item_rename_mouseindependent(wmOperatorType *ot)
+{
+	ot->name = "Rename Item";
+	ot->idname = "OUTLINER_OT_item_rename_mouseindependent";
+	ot->description = "Rename item without hovering over item";
+	ot->invoke = outliner_item_rename_mouseindependent;
+	ot->poll = ED_operator_outliner_active;
+}
+////////// BETTER BLENDER END ////////// 
 
 void OUTLINER_OT_item_rename(wmOperatorType *ot)
 {

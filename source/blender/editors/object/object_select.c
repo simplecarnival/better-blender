@@ -551,7 +551,12 @@ static bool select_grouped_children(bContext *C, Object *ob, const bool recursiv
 	{
 		if (ob == base->object->parent) {
 			if (!(base->flag & SELECT)) {
-				ED_base_object_select(base, BA_SELECT);
+				////////// BETTER BLENDER BEGIN: ALWAYS ALLOW DELETE //////////
+//				ED_base_object_select(base, BA_SELECT);
+
+				base->flag |= SELECT;
+				base->object->flag = base->flag;
+				////////// BETTER BLENDER END ////////// 
 				changed = true;
 			}
 

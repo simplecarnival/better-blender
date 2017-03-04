@@ -180,7 +180,10 @@ static void restrictbutton_recursive_child(bContext *C, Scene *scene, Object *ob
 	for (ob = bmain->object.first; ob; ob = ob->id.next) {
 		if (BKE_object_is_child_recursive(ob_parent, ob)) {
 			/* only do if child object is selectable */
-			if ((flag == OB_RESTRICT_SELECT) || (ob->restrictflag & OB_RESTRICT_SELECT) == 0) {
+			////////// BETTER BLENDER BEGIN: PARENT TOGGLE CHANGES CHILDREN //////////
+//			if ((flag == OB_RESTRICT_SELECT) || (ob->restrictflag & OB_RESTRICT_SELECT) == 0) {
+			{
+			////////// BETTER BLENDER END ////////// 
 				if (state) {
 					ob->restrictflag |= flag;
 					if (deselect) {
@@ -237,11 +240,17 @@ static void restrictbutton_view_cb(bContext *C, void *poin, void *poin2)
 		ED_base_object_select(BKE_scene_base_find(scene, ob), BA_DESELECT);
 	}
 
-	if (CTX_wm_window(C)->eventstate->ctrl) {
-		restrictbutton_recursive_child(C, scene, ob, OB_RESTRICT_VIEW,
-		                               (ob->restrictflag & OB_RESTRICT_VIEW) != 0, true, "hide");
-	}
+	////////// BETTER BLENDER BEGIN: PARENT TOGGLE CHANGES CHILDREN //////////
+//	if (CTX_wm_window(C)->eventstate->ctrl) {
+//		restrictbutton_recursive_child(C, scene, ob, OB_RESTRICT_VIEW,
+//		                               (ob->restrictflag & OB_RESTRICT_VIEW) != 0, true, "hide");
+//	}
 
+	if (!(CTX_wm_window(C)->eventstate->ctrl)) {
+		restrictbutton_recursive_child(C, scene, ob, OB_RESTRICT_VIEW,
+			(ob->restrictflag & OB_RESTRICT_VIEW) != 0, true, "hide");
+	}
+	////////// BETTER BLENDER END ////////// 
 	WM_event_add_notifier(C, NC_SCENE | ND_OB_SELECT, scene);
 
 }
@@ -260,11 +269,17 @@ static void restrictbutton_sel_cb(bContext *C, void *poin, void *poin2)
 		ED_base_object_select(BKE_scene_base_find(scene, ob), BA_DESELECT);
 	}
 
-	if (CTX_wm_window(C)->eventstate->ctrl) {
-		restrictbutton_recursive_child(C, scene, ob, OB_RESTRICT_SELECT,
-		                               (ob->restrictflag & OB_RESTRICT_SELECT) != 0, true, NULL);
-	}
+	////////// BETTER BLENDER BEGIN: PARENT TOGGLE CHANGES CHILDREN //////////
+//	if (CTX_wm_window(C)->eventstate->ctrl) {
+//		restrictbutton_recursive_child(C, scene, ob, OB_RESTRICT_SELECT,
+//		                               (ob->restrictflag & OB_RESTRICT_SELECT) != 0, true, NULL);
+//	}
 
+	if (!(CTX_wm_window(C)->eventstate->ctrl)) {
+		restrictbutton_recursive_child(C, scene, ob, OB_RESTRICT_SELECT,
+			(ob->restrictflag & OB_RESTRICT_SELECT) != 0, true, NULL);
+	}
+	////////// BETTER BLENDER END ////////// 
 	WM_event_add_notifier(C, NC_SCENE | ND_OB_SELECT, scene);
 
 }
@@ -273,11 +288,17 @@ static void restrictbutton_rend_cb(bContext *C, void *poin, void *poin2)
 {
 	Object *ob = (Object *)poin2;
 
-	if (CTX_wm_window(C)->eventstate->ctrl) {
-		restrictbutton_recursive_child(C, (Scene *)poin, ob, OB_RESTRICT_RENDER,
-		                               (ob->restrictflag & OB_RESTRICT_RENDER) != 0, false, "hide_render");
-	}
+	////////// BETTER BLENDER BEGIN: PARENT TOGGLE CHANGES CHILDREN //////////
+//	if (CTX_wm_window(C)->eventstate->ctrl) {
+//		restrictbutton_recursive_child(C, (Scene *)poin, ob, OB_RESTRICT_RENDER,
+//		                               (ob->restrictflag & OB_RESTRICT_RENDER) != 0, false, "hide_render");
+//	}
 
+	if (!(CTX_wm_window(C)->eventstate->ctrl)) {
+		restrictbutton_recursive_child(C, (Scene *)poin, ob, OB_RESTRICT_RENDER,
+			(ob->restrictflag & OB_RESTRICT_RENDER) != 0, false, "hide_render");
+	}
+	////////// BETTER BLENDER END ////////// 
 	WM_event_add_notifier(C, NC_SCENE | ND_OB_RENDER, poin);
 }
 
@@ -626,24 +647,46 @@ static void outliner_draw_restrictbuts(uiBlock *block, Scene *scene, ARegion *ar
 				RNA_pointer_create((ID *)ob, &RNA_Object, ob, &ptr);
 
 				UI_block_emboss_set(block, UI_EMBOSS_NONE);
+
+				////////// BETTER BLENDER BEGIN: PARENT TOGGLE CHANGES CHILDREN //////////
+//				bt = uiDefIconButR_prop(block, UI_BTYPE_ICON_TOGGLE, 0, ICON_RESTRICT_VIEW_OFF,
+//				                        (int)(ar->v2d.cur.xmax - OL_TOG_RESTRICT_VIEWX), te->ys, UI_UNIT_X, UI_UNIT_Y,
+//				                        &ptr, object_prop_hide, -1, 0, 0, -1, -1,
+//				                        TIP_("Restrict viewport visibility (Ctrl - Recursive)"));
+
 				bt = uiDefIconButR_prop(block, UI_BTYPE_ICON_TOGGLE, 0, ICON_RESTRICT_VIEW_OFF,
-				                        (int)(ar->v2d.cur.xmax - OL_TOG_RESTRICT_VIEWX), te->ys, UI_UNIT_X, UI_UNIT_Y,
-				                        &ptr, object_prop_hide, -1, 0, 0, -1, -1,
-				                        TIP_("Restrict viewport visibility (Ctrl - Recursive)"));
+					(int)(ar->v2d.cur.xmax - OL_TOG_RESTRICT_VIEWX), te->ys, UI_UNIT_X, UI_UNIT_Y,
+					&ptr, object_prop_hide, -1, 0, 0, -1, -1,
+					TIP_("Restrict viewport visibility (Ctrl: affect just this item)"));
+				////////// BETTER BLENDER END ////////// 
 				UI_but_func_set(bt, restrictbutton_view_cb, scene, ob);
 				UI_but_flag_enable(bt, UI_BUT_DRAG_LOCK);
 				
+				////////// BETTER BLENDER BEGIN: PARENT TOGGLE CHANGES CHILDREN //////////
+//				bt = uiDefIconButR_prop(block, UI_BTYPE_ICON_TOGGLE, 0, ICON_RESTRICT_SELECT_OFF,
+//				                        (int)(ar->v2d.cur.xmax - OL_TOG_RESTRICT_SELECTX), te->ys, UI_UNIT_X, UI_UNIT_Y,
+//				                        &ptr, object_prop_hide_select, -1, 0, 0, -1, -1,
+//				                        TIP_("Restrict viewport selection (Ctrl - Recursive)"));
+
 				bt = uiDefIconButR_prop(block, UI_BTYPE_ICON_TOGGLE, 0, ICON_RESTRICT_SELECT_OFF,
-				                        (int)(ar->v2d.cur.xmax - OL_TOG_RESTRICT_SELECTX), te->ys, UI_UNIT_X, UI_UNIT_Y,
-				                        &ptr, object_prop_hide_select, -1, 0, 0, -1, -1,
-				                        TIP_("Restrict viewport selection (Ctrl - Recursive)"));
+					(int)(ar->v2d.cur.xmax - OL_TOG_RESTRICT_SELECTX), te->ys, UI_UNIT_X, UI_UNIT_Y,
+					&ptr, object_prop_hide_select, -1, 0, 0, -1, -1,
+					TIP_("Restrict viewport selection (Ctrl: affect just this item)"));
+				////////// BETTER BLENDER END ////////// 
 				UI_but_func_set(bt, restrictbutton_sel_cb, scene, ob);
 				UI_but_flag_enable(bt, UI_BUT_DRAG_LOCK);
 				
+				////////// BETTER BLENDER BEGIN: PARENT TOGGLE CHANGES CHILDREN //////////
+//				bt = uiDefIconButR_prop(block, UI_BTYPE_ICON_TOGGLE, 0, ICON_RESTRICT_RENDER_OFF,
+//				                        (int)(ar->v2d.cur.xmax - OL_TOG_RESTRICT_RENDERX), te->ys, UI_UNIT_X, UI_UNIT_Y,
+//				                        &ptr, object_prop_hide_render, -1, 0, 0, -1, -1,
+//				                        TIP_("Restrict rendering (Ctrl - Recursive)"));
+
 				bt = uiDefIconButR_prop(block, UI_BTYPE_ICON_TOGGLE, 0, ICON_RESTRICT_RENDER_OFF,
-				                        (int)(ar->v2d.cur.xmax - OL_TOG_RESTRICT_RENDERX), te->ys, UI_UNIT_X, UI_UNIT_Y,
-				                        &ptr, object_prop_hide_render, -1, 0, 0, -1, -1,
-				                        TIP_("Restrict rendering (Ctrl - Recursive)"));
+					(int)(ar->v2d.cur.xmax - OL_TOG_RESTRICT_RENDERX), te->ys, UI_UNIT_X, UI_UNIT_Y,
+					&ptr, object_prop_hide_render, -1, 0, 0, -1, -1,
+					TIP_("Restrict rendering (Ctrl: affect just this item)"));
+				////////// BETTER BLENDER END ////////// 
 				UI_but_func_set(bt, restrictbutton_rend_cb, scene, ob);
 				UI_but_flag_enable(bt, UI_BUT_DRAG_LOCK);
 				

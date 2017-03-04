@@ -884,7 +884,9 @@ enum {
 	OL_OP_DESELECT,
 	OL_OP_SELECT_HIERARCHY,
 	OL_OP_DELETE,
-	OL_OP_DELETE_HIERARCHY,
+	////////// BETTER BLENDER BEGIN: DELETE PARENT DELETES ALL CHILDREN //////////
+//	OL_OP_DELETE_HIERARCHY,
+	////////// BETTER BLENDER END ////////// 
 	OL_OP_REMAP,
 	OL_OP_LOCALIZED,  /* disabled, see below */
 	OL_OP_TOGVIS,
@@ -898,7 +900,9 @@ static EnumPropertyItem prop_object_op_types[] = {
 	{OL_OP_DESELECT, "DESELECT", 0, "Deselect", ""},
 	{OL_OP_SELECT_HIERARCHY, "SELECT_HIERARCHY", 0, "Select Hierarchy", ""},
 	{OL_OP_DELETE, "DELETE", 0, "Delete", ""},
-	{OL_OP_DELETE_HIERARCHY, "DELETE_HIERARCHY", 0, "Delete Hierarchy", ""},
+	////////// BETTER BLENDER BEGIN: DELETE PARENT DELETES ALL CHILDREN //////////
+//	{OL_OP_DELETE_HIERARCHY, "DELETE_HIERARCHY", 0, "Delete Hierarchy", ""},
+	////////// BETTER BLENDER END ////////// 
 	{OL_OP_REMAP, "REMAP",   0, "Remap Users",
 	 "Make all users of selected datablocks to use instead a new chosen one"},
 	{OL_OP_TOGVIS, "TOGVIS", 0, "Toggle Visible", ""},
@@ -947,7 +951,11 @@ static int outliner_object_operation_exec(bContext *C, wmOperator *op)
 		WM_event_add_notifier(C, NC_SCENE | ND_OB_SELECT, scene);
 	}
 	else if (event == OL_OP_DELETE) {
-		outliner_do_object_operation(C, op->reports, scene, soops, &soops->tree, object_delete_cb);
+		////////// BETTER BLENDER BEGIN: DELETE PARENT DELETES ALL CHILDREN //////////
+//		outliner_do_object_operation(C, op->reports, scene, soops, &soops->tree, object_delete_cb);
+
+		outliner_do_object_operation(C, op->reports, scene, soops, &soops->tree, object_delete_hierarchy_cb);
+		////////// BETTER BLENDER END ////////// 
 
 		/* XXX: tree management normally happens from draw_outliner(), but when
 		 *      you're clicking to fast on Delete object from context menu in
@@ -960,16 +968,18 @@ static int outliner_object_operation_exec(bContext *C, wmOperator *op)
 		str = "Delete Objects";
 		WM_event_add_notifier(C, NC_SCENE | ND_OB_ACTIVE, scene);
 	}
-	else if (event == OL_OP_DELETE_HIERARCHY) {
-		outliner_do_object_operation_ex(C, op->reports, scene, soops, &soops->tree, object_delete_hierarchy_cb, false);
-
-		/* XXX: See OL_OP_DELETE comment above. */
-		outliner_cleanup_tree(soops);
-
-		DAG_relations_tag_update(bmain);
-		str = "Delete Object Hierarchy";
-		WM_event_add_notifier(C, NC_SCENE | ND_OB_ACTIVE, scene);
-	}
+	////////// BETTER BLENDER BEGIN: DELETE PARENT DELETES ALL CHILDREN //////////
+//	else if (event == OL_OP_DELETE_HIERARCHY) {
+//		outliner_do_object_operation_ex(C, op->reports, scene, soops, &soops->tree, object_delete_hierarchy_cb, false);
+//
+//		/* XXX: See OL_OP_DELETE comment above. */
+//		outliner_cleanup_tree(soops);
+//
+//		DAG_relations_tag_update(bmain);
+//		str = "Delete Object Hierarchy";
+//		WM_event_add_notifier(C, NC_SCENE | ND_OB_ACTIVE, scene);
+//	}
+	////////// BETTER BLENDER END ////////// 
 	else if (event == OL_OP_REMAP) {
 		outliner_do_libdata_operation(C, op->reports, scene, soops, &soops->tree, id_remap_cb, NULL);
 		str = "Remap ID";

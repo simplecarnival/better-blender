@@ -72,10 +72,12 @@ static int toolbox_invoke(bContext *C, wmOperator *UNUSED(op), const wmEvent *UN
 
 	RNA_pointer_create(&sc->id, &RNA_SpaceProperties, sbuts, &ptr);
 
-	pup = UI_popup_menu_begin(C, IFACE_("Align"), ICON_NONE);
-	layout = UI_popup_menu_layout(pup);
-	uiItemsEnumR(layout, &ptr, "align");
-	UI_popup_menu_end(C, pup);
+	////////// BETTER BLENDER BEGIN: PROPERTY WINDOW SHOULD ALWAYS BE VERTICAL //////////
+//	pup = UI_popup_menu_begin(C, IFACE_("Align"), ICON_NONE);
+//	layout = UI_popup_menu_layout(pup);
+//	uiItemsEnumR(layout, &ptr, "align");
+//	UI_popup_menu_end(C, pup);
+	////////// BETTER BLENDER END ////////// 
 
 	return OPERATOR_INTERFACE;
 }

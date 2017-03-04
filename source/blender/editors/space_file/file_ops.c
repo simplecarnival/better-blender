@@ -759,7 +759,11 @@ void FILE_OT_select_walk(wmOperatorType *ot)
 	RNA_def_property_flag(prop, PROP_SKIP_SAVE);
 }
 
-static int file_select_all_exec(bContext *C, wmOperator *UNUSED(op))
+////////// BETTER BLENDER BEGIN: HAVE SELECT ALL/DESELECT ALL/INVERT FOR FUNCTIONS THAT DON'T HAVE IT //////////
+//static int file_select_all_exec(bContext *C, wmOperator *UNUSED(op))
+
+static int file_select_all_exec(bContext *C, wmOperator *op)
+////////// BETTER BLENDER END ////////// 
 {
 	ScrArea *sa = CTX_wm_area(C);
 	SpaceFile *sfile = CTX_wm_space_file(C);
@@ -770,12 +774,58 @@ static int file_select_all_exec(bContext *C, wmOperator *UNUSED(op))
 	sel.first = 0; 
 	sel.last = numfiles - 1;
 
-	/* select all only if previously no file was selected */
-	if (has_selection) {
+	////////// BETTER BLENDER BEGIN: HAVE SELECT ALL/DESELECT ALL/INVERT FOR FUNCTIONS THAT DON'T HAVE IT //////////
+//	/* select all only if previously no file was selected */
+//	if (has_selection) {
+//		filelist_entries_select_index_range_set(sfile->files, &sel, FILE_SEL_REMOVE, FILE_SEL_SELECTED, CHECK_ALL);
+//		sfile->params->active_file = -1;
+//	}
+//	else {
+//		const FileCheckType check_type = (sfile->params->flag & FILE_DIRSEL_ONLY) ? CHECK_DIRS : CHECK_FILES;
+//		int i;
+//
+//		filelist_entries_select_index_range_set(sfile->files, &sel, FILE_SEL_ADD, FILE_SEL_SELECTED, check_type);
+//
+//		/* set active_file to first selected */
+//		for (i = 0; i < numfiles; i++) {
+//			if (filelist_entry_select_index_get(sfile->files, i, check_type)) {
+//				sfile->params->active_file = i;
+//				break;
+//			}
+//		}
+//	}
+
+	int action = RNA_enum_get(op->ptr, "action");
+
+	if (action == SEL_TOGGLE || action == SEL_INVERT) {
+		// TODO: True inverting of files isn't implemented
+		/* select all only if previously no file was selected */
+		if (has_selection) {
+			filelist_entries_select_index_range_set(sfile->files, &sel, FILE_SEL_REMOVE, FILE_SEL_SELECTED, CHECK_ALL);
+			sfile->params->active_file = -1;
+		}
+		else {
+			const FileCheckType check_type = (sfile->params->flag & FILE_DIRSEL_ONLY) ? CHECK_DIRS : CHECK_FILES;
+			int i;
+
+			filelist_entries_select_index_range_set(sfile->files, &sel, FILE_SEL_ADD, FILE_SEL_SELECTED, check_type);
+
+			/* set active_file to first selected */
+			for (i = 0; i < numfiles; i++) {
+				if (filelist_entry_select_index_get(sfile->files, i, check_type)) {
+					sfile->params->active_file = i;
+					break;
+				}
+			}
+		}
+	}
+	else if (action == SEL_DESELECT)
+	{
 		filelist_entries_select_index_range_set(sfile->files, &sel, FILE_SEL_REMOVE, FILE_SEL_SELECTED, CHECK_ALL);
 		sfile->params->active_file = -1;
 	}
-	else {
+	else // action == SEL_SELECT
+	{
 		const FileCheckType check_type = (sfile->params->flag & FILE_DIRSEL_ONLY) ? CHECK_DIRS : CHECK_FILES;
 		int i;
 
@@ -789,6 +839,7 @@ static int file_select_all_exec(bContext *C, wmOperator *UNUSED(op))
 			}
 		}
 	}
+	////////// BETTER BLENDER END ////////// 
 
 	file_draw_check(C);
 	WM_event_add_mousemove(C);
@@ -809,6 +860,9 @@ void FILE_OT_select_all_toggle(wmOperatorType *ot)
 	ot->poll = ED_operator_file_active;
 
 	/* properties */
+	////////// BETTER BLENDER BEGIN: HAVE SELECT ALL/DESELECT ALL/INVERT FOR FUNCTIONS THAT DON'T HAVE IT //////////
+	WM_operator_properties_select_all(ot);
+	////////// BETTER BLENDER END ////////// 
 }
 
 /* ---------- BOOKMARKS ----------- */
