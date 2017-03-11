@@ -897,6 +897,10 @@ extern int GHOST_toggleConsole(int action);
  */
 extern int GHOST_confirmQuit(GHOST_WindowHandle windowhandle);
 
+////////// BETTER BLENDER BEGIN: ELIMINATE POPUP BOXES //////////
+extern int GHOST_confirmMessageWindows(GHOST_WindowHandle windowhandle, const char *message);
+////////// BETTER BLENDER END ////////// 
+
 /**
  * Use native pixel size (MacBook pro 'retina'), if supported.
  */

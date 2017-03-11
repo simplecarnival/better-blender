@@ -241,6 +241,7 @@ void BLT_lang_init(void)
 
 	////////// BETTER BLENDER BEGIN: LIST CHANGES IN CONSOLE WINDOW //////////
 	// List out all of the Better Blender changes in the console window -- with the newest changes first -- so I can tell if a particular feature is present on a particular installation.
+	printf("////////// BETTER BLENDER BEGIN: ELIMINATE POPUP BOXES //////////\n");
 	printf("////////// BETTER BLENDER BEGIN: ALWAYS ALLOW DELETE //////////\n");
 	printf("////////// BETTER BLENDER BEGIN: NEW LIGHTS SHOULD BE PREFACED WITH \"Light - xxxxxx\" //////////\n");
 	printf("////////// BETTER BLENDER BEGIN: DUPLICATE OBJECT DUPLICATES ALL CHILDREN //////////\n");

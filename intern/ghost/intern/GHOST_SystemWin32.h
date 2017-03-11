@@ -214,6 +214,10 @@ public:
  */
 	int confirmQuit(GHOST_IWindow *window) const;
 
+	////////// BETTER BLENDER BEGIN: ELIMINATE POPUP BOXES //////////
+	int confirmMessageWindows(GHOST_IWindow *window, const char *message) const;
+	////////// BETTER BLENDER END ////////// 
+
 protected:
 	/**
 	 * Initializes the system.

@@ -1170,7 +1170,27 @@ int WM_operator_confirm_message_ex(bContext *C, wmOperator *op,
 
 int WM_operator_confirm_message(bContext *C, wmOperator *op, const char *message)
 {
-	return WM_operator_confirm_message_ex(C, op, IFACE_("OK?"), ICON_QUESTION, message);
+	////////// BETTER BLENDER BEGIN: ELIMINATE POPUP BOXES //////////
+//	return WM_operator_confirm_message_ex(C, op, IFACE_("OK?"), ICON_QUESTION, message);
+
+	// The 'question' that Blender asks isn't really a question. We need to add a question mark after it.
+	char *str = op->type->name;
+	char c = '?';
+	size_t len = strlen(str);
+	char *str2 = malloc(len + 2); /* one for extra char, one for trailing zero */
+	strcpy(str2, str);
+	str2[len] = c;
+	str2[len + 1] = '\0';
+
+	if (1 == GHOST_confirmMessageWindows(CTX_wm_manager(C)->windows.first, str2))
+	{
+		wmOperatorType *operatorType = op->type;
+		operatorType->exec(C, op);
+	}
+
+	free(str2);
+	return 1;
+	////////// BETTER BLENDER END ////////// 
 }
 
 int WM_operator_confirm(bContext *C, wmOperator *op, const wmEvent *UNUSED(event))

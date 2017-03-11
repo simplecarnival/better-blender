@@ -1577,3 +1577,13 @@ int GHOST_SystemWin32::confirmQuit(GHOST_IWindow *window) const
 	return (MessageBox(window ? ((GHOST_WindowWin32 *)window)->getHWND() : 0, "Some changes have not been saved.\nDo you really want to quit?",
 	                   "Exit Blender", MB_OKCANCEL | MB_ICONWARNING | MB_TOPMOST) == IDOK);
 }
+
+////////// BETTER BLENDER BEGIN: ELIMINATE POPUP BOXES //////////
+int GHOST_SystemWin32::confirmMessageWindows(GHOST_IWindow *window, const char *message) const
+{
+	int i = (MessageBox(window ? ((GHOST_WindowWin32 *)window)->getHWND() : 0, message,
+		"Better Blender", MB_YESNO | MB_ICONQUESTION | MB_TOPMOST) == IDYES);
+
+	return i;
+}
+////////// BETTER BLENDER END //////////

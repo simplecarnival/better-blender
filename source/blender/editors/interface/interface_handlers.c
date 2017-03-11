@@ -9340,7 +9340,7 @@ static int ui_handle_menu_event(
 					}
 					else if (saferct && !BLI_rctf_isect_pt(&saferct->parent, event->x, event->y)) {
 						if (block->flag & (UI_BLOCK_OUT_1))
-							menu->menuretval = UI_RETURN_OK;
+						menu->menuretval = UI_RETURN_OK;
 						else
 							menu->menuretval = UI_RETURN_OUT;
 					}

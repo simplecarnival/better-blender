@@ -900,6 +900,14 @@ int GHOST_confirmQuit(GHOST_WindowHandle windowhandle)
 	return system->confirmQuit((GHOST_IWindow *) windowhandle);
 }
 
+////////// BETTER BLENDER BEGIN: ELIMINATE POPUP BOXES //////////
+int GHOST_confirmMessageWindows(GHOST_WindowHandle windowhandle, const char *message)
+{
+	GHOST_ISystem *system = GHOST_ISystem::getSystem();
+	return system->confirmMessageWindows((GHOST_IWindow *)windowhandle, message);
+}
+////////// BETTER BLENDER END ////////// 
+
 int GHOST_UseNativePixels(void)
 {
 	GHOST_ISystem *system = GHOST_ISystem::getSystem();

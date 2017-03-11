@@ -380,6 +380,13 @@ int GHOST_System::confirmQuit(GHOST_IWindow * /*window*/) const
 	return 1;
 }
 
+////////// BETTER BLENDER BEGIN: ELIMINATE POPUP BOXES //////////
+int GHOST_System::confirmMessageWindows(GHOST_IWindow *, const char *) const
+{
+	return 1;
+}
+////////// BETTER BLENDER END //////////
+
 bool GHOST_System::useNativePixel(void)
 {
 	m_nativePixel = true;

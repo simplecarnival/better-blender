@@ -418,6 +418,11 @@ public:
 	 * in the application
 	 */
 	virtual int confirmQuit(GHOST_IWindow *window) const = 0;
+
+	////////// BETTER BLENDER BEGIN: ELIMINATE POPUP BOXES //////////
+	virtual int confirmMessageWindows(GHOST_IWindow *window, const char *message) const = 0;
+	////////// BETTER BLENDER END ////////// 
+
 protected:
 	/**
 	 * Initialize the system.
