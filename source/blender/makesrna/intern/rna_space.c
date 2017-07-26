@@ -2206,8 +2206,13 @@ static void rna_def_background_image(BlenderRNA *brna)
 	
 	prop = RNA_def_property(srna, "offset_y", PROP_FLOAT, PROP_NONE);
 	RNA_def_property_float_sdna(prop, NULL, "yof");
-	RNA_def_property_ui_text(prop, "Y Offset", "Offset image vertically from the world origin");
+	////////// BETTER BLENDER BEGIN: SET START FRAME FOR BACKGROUND VIDEO //////////
+//	RNA_def_property_ui_text(prop, "Y Offset", "Offset image vertically from the world origin");
+
+	RNA_def_property_ui_text(prop, "Y Offset", "Offset image vertically from the world origin ***OR*** offset movie clip starting frame if background image");
+	////////// BETTER BLENDER END ////////// 
 	RNA_def_property_update(prop, NC_SPACE | ND_SPACE_VIEW3D, NULL);
+
 	
 	prop = RNA_def_property(srna, "size", PROP_FLOAT, PROP_DISTANCE);
 	RNA_def_property_float_sdna(prop, NULL, "size");

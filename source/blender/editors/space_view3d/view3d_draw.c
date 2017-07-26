@@ -1705,7 +1705,13 @@ static void view3d_draw_bgpic(Scene *scene, ARegion *ar, View3D *v3d,
 				if (clip == NULL)
 					continue;
 
-				BKE_movieclip_user_set_frame(&bgpic->cuser, CFRA);
+				////////// BETTER BLENDER BEGIN: SET START FRAME FOR BACKGROUND VIDEO //////////
+//				BKE_movieclip_user_set_frame(&bgpic->cuser, CFRA);
+
+				// We're going to use the Y offset for movies to determine the frame number, as it's rarely used and we want to save the value
+				// to the Blender file without changing the file format.
+				BKE_movieclip_user_set_frame(&bgpic->cuser, CFRA - (int)bgpic->yof);
+				////////// BETTER BLENDER END ////////// 
 				ibuf = BKE_movieclip_get_ibuf(clip, &bgpic->cuser);
 
 				image_aspect[0] = clip->aspx;
@@ -1759,7 +1765,13 @@ static void view3d_draw_bgpic(Scene *scene, ARegion *ar, View3D *v3d,
 				{
 					const float max_dim = max_ff(x2 - x1, y2 - y1);
 					const float xof_scale = bgpic->xof * max_dim;
-					const float yof_scale = bgpic->yof * max_dim;
+					
+
+					////////// BETTER BLENDER BEGIN: SET START FRAME FOR BACKGROUND VIDEO //////////
+//					const float yof_scale = bgpic->yof * max_dim;
+
+					const float yof_scale = (bgpic->source == V3D_BGPIC_MOVIE) ? 0 : bgpic->yof * max_dim;
+					////////// BETTER BLENDER END ////////// 
 
 					x1 += xof_scale;
 					y1 += yof_scale;
@@ -1817,10 +1829,28 @@ static void view3d_draw_bgpic(Scene *scene, ARegion *ar, View3D *v3d,
 				zero_v3(tvec);
 				ED_view3d_project_float_v2_m4(ar, tvec, sco, rv3d->persmat);
 
-				x1 =  sco[0] + fac * (bgpic->xof - bgpic->size);
-				y1 =  sco[1] + asp * fac * (bgpic->yof - bgpic->size);
-				x2 =  sco[0] + fac * (bgpic->xof + bgpic->size);
-				y2 =  sco[1] + asp * fac * (bgpic->yof + bgpic->size);
+				////////// BETTER BLENDER BEGIN: SET START FRAME FOR BACKGROUND VIDEO //////////
+//				x1 =  sco[0] + fac * (bgpic->xof - bgpic->size);
+//				y1 =  sco[1] + asp * fac * (bgpic->yof - bgpic->size);
+//				x2 =  sco[0] + fac * (bgpic->xof + bgpic->size);
+//				y2 =  sco[1] + asp * fac * (bgpic->yof + bgpic->size);
+
+				if (bgpic->source == V3D_BGPIC_MOVIE)
+				{
+					// Remember, we cannot use the Y offset for movies since we use that as the frame offset.
+					x1 = sco[0] + fac * (bgpic->xof - bgpic->size);
+					y1 = sco[1] + asp * fac * (0 - bgpic->size);
+					x2 = sco[0] + fac * (bgpic->xof + bgpic->size);
+					y2 = sco[1] + asp * fac * (0+ bgpic->size);
+				}
+				else
+				{
+					x1 = sco[0] + fac * (bgpic->xof - bgpic->size);
+					y1 = sco[1] + asp * fac * (bgpic->yof - bgpic->size);
+					x2 = sco[0] + fac * (bgpic->xof + bgpic->size);
+					y2 = sco[1] + asp * fac * (bgpic->yof + bgpic->size);
+				}
+				////////// BETTER BLENDER END ////////// 
 
 				centx = (x1 + x2) / 2.0f;
 				centy = (y1 + y2) / 2.0f;
