@@ -2678,7 +2678,10 @@ static void rna_def_tool_settings(BlenderRNA  *brna)
 	RNA_def_property_boolean_sdna(prop, NULL, "autokey_mode", AUTOKEY_ON);
 	RNA_def_property_ui_text(prop, "Auto Keying", "Automatic keyframe insertion for Objects and Bones");
 	RNA_def_property_ui_icon(prop, ICON_REC, 0);
-	
+	////////// BETTER BLENDER BEGIN: OBNOXIOUS RECORD //////////
+	RNA_def_property_update(prop, NC_SPACE | ND_SPACE_DOPESHEET, NULL);
+	////////// BETTER BLENDER END //////////
+
 	prop = RNA_def_property(srna, "auto_keying_mode", PROP_ENUM, PROP_NONE);
 	RNA_def_property_enum_bitflag_sdna(prop, NULL, "autokey_mode");
 	RNA_def_property_enum_items(prop, auto_key_items);

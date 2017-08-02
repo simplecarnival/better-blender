@@ -53,6 +53,9 @@
 #include "ED_anim_api.h"
 #include "ED_keyframes_edit.h"
 #include "ED_keyframes_draw.h"
+////////// BETTER BLENDER BEGIN: OBNOXIOUS RECORD //////////
+#include "ED_keyframing.h"
+////////// BETTER BLENDER END //////////
 
 #include "RNA_access.h"
 
@@ -96,8 +99,12 @@ static void draw_cfra_number(Scene *scene, View2D *v2d, const float cfra, const 
 	y = 0.9f * U.widget_unit;
 	
 	/* draw green box around/behind text */
-	UI_ThemeColorShade(TH_CFRAME, 0);
-	glRectf(x, y,  x + slen,  y + 0.75f * U.widget_unit);
+	////////// BETTER BLENDER BEGIN: OBNOXIOUS RECORD //////////
+//	UI_ThemeColorShade(TH_CFRAME, 0);
+
+	UI_ThemeColorShade(IS_AUTOKEY_ON(scene) ? TH_AXIS_X : TH_CFRAME, 0);
+	////////// BETTER BLENDER END //////////
+	glRectf(x, y, x + slen, y + 0.75f * U.widget_unit);
 	
 	/* draw current frame number - black text */
 	UI_ThemeColor(TH_TEXT);
@@ -113,7 +120,11 @@ void ANIM_draw_cfra(const bContext *C, View2D *v2d, short flag)
 	Scene *scene = CTX_data_scene(C);
 
 	/* Draw a light green line to indicate current frame */
-	UI_ThemeColor(TH_CFRAME);
+	////////// BETTER BLENDER BEGIN: OBNOXIOUS RECORD //////////
+//	UI_ThemeColor(TH_CFRAME);
+
+	UI_ThemeColor(IS_AUTOKEY_ON(scene) ? TH_AXIS_X : TH_CFRAME);
+	////////// BETTER BLENDER END ////////// 
 
 	const float x = (float)(scene->r.cfra * scene->r.framelen);
 
