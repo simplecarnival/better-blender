@@ -6744,6 +6744,11 @@ static bool ui_but_menu(bContext *C, uiBut *but)
 			else {
 				uiItemBooleanO(layout, CTX_IFACE_(BLT_I18NCONTEXT_OPERATOR_DEFAULT, "Insert Keyframe"),
 				               ICON_KEY_HLT, "ANIM_OT_keyframe_insert_button", "all", 1);
+				////////// BETTER BLENDER BEGIN: INSERT KEYFRAMES RECURSIVE //////////
+				uiItemBooleanO(layout, CTX_IFACE_(BLT_I18NCONTEXT_OPERATOR_DEFAULT, "Insert Recursive Keyframes"),
+					ICON_KEY_HLT, "ANIM_OT_keyframe_recursive_insert_button", "all", 1);
+				////////// BETTER BLENDER END //////////
+
 			}
 		}
 		
