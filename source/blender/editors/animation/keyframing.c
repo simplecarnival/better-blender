@@ -1874,59 +1874,7 @@ static int set_custom_keyframe(bContext *C, wmOperator *op, PointerRNA ptr, Prop
 				}
 
 				success = insert_keyframe(op->reports, ptr.id.data, NULL, NULL, path, index, cfra, ts->keyframe_type, flag);
-
-				Main *bmain = CTX_data_main(C);
-				Object *ob;
-
-				for (ob = bmain->object.first; ob; ob = ob->id.next) {
-
-					char parname[MAX_ID_NAME], childname[MAX_ID_NAME];
-					int partype = -1;
-					/*					partype = RNA_enum_get(op->ptr, "type");
-					RNA_string_get(op->ptr, "parent", parname);
-					par = (Object *)BKE_libblock_find_name(ID_OB, parname);
-					RNA_string_get(op->ptr, "child", childname);
-					*/
-					ModifierData *md;
-					RNA_string_get(op->ptr, "child", childname);
-
-					//					md = modifiers_findByName(ob, modifier_name);
-
-
-					int a = 0;
-					a++;
-
-					/*
-					if (md && type != 0 && md->type != type)
-					md = NULL;
-					*/
-					//					insert_keyframe(op->reports, ptr.id.data, NULL, NULL, path, index, cfra, ts->keyframe_type, flag);
-
-					//if (BKE_object_is_child_recursive(ob_parent, ob)) {
-					//	/* only do if child object is selectable */
-					//	if (state) {
-					//		ob->restrictflag |= flag;
-					//		if (deselect) {
-					//			ED_base_object_select(BKE_scene_base_find(scene, ob), BA_DESELECT);
-					//		}
-					//	}
-					//	else {
-					//		ob->restrictflag &= ~flag;
-					//	}
-					//}
-				}
-
 				MEM_freeN(path);
-
-				/*
-				Object *ob = (Object *)poin2;
-
-				restrictbutton_recursive_child(C, scene, ob, OB_RESTRICT_RENDER,
-				(ob->restrictflag & OB_RESTRICT_RENDER) != 0, false, "hide_render");
-				WM_event_add_notifier(C, NC_SCENE | ND_OB_RENDER, scene);
-				*/
-
-
 			}
 			else {
 				BKE_report(op->reports, RPT_WARNING,
@@ -1951,8 +1899,6 @@ static int set_custom_keyframe(bContext *C, wmOperator *op, PointerRNA ptr, Prop
 	return success;
 }
 
-
-
 static int insert_recursive_key_button_exec(bContext *C, wmOperator *op)
 {
 	Scene *scene = CTX_data_scene(C);
@@ -1971,6 +1917,8 @@ static int insert_recursive_key_button_exec(bContext *C, wmOperator *op)
 	but = UI_context_active_but_get(C);
 	UI_context_active_but_prop_get(C, &ptr, &prop, &index);
 
+	// The name we clicked is ((ID*)(ptr.id.data))->name
+
 	// Set the keyframe that we actually clicked on.
 	success = set_custom_keyframe(C, op, ptr, prop, but, all, index, flag);
 	if (!success) return OPERATOR_CANCELLED;
@@ -1982,32 +1930,27 @@ static int insert_recursive_key_button_exec(bContext *C, wmOperator *op)
 
 	if (ar) {
 		uiBlock *block;
-		uiBut *but2, *otherbut = NULL;
-	
+		uiBut *otherbut = NULL;
+		Main *bmain = CTX_data_main(C);
+
+		// Find the object that we just clicked so we can set our parent object.
+		Object *ob;
+		Object *ob_parent;
+		for (ob = bmain->object.first; ob; ob = ob->id.next) {
+			if (0 == strcmp(ob->id.name, ((ID*)(ptr.id.data))->name)) {
+				// Found it!
+				ob_parent = ob;
+				break;
+			}
+		}
 
 		for (block = ar->uiblocks.first; block; block = block->next) {
-			for (but2 = block->buttons.first; but2; but2 = but2->next) {
-//				if (but->type == UI_BTYPE_LINK && but->link) {
-				/*
-				int typppppppppppe = but->type;
-				int b10 = UI_BTYPE_ICON_TOGGLE;
-				*/
-
-
-				if (!but2->active) {
+			for (otherbut = block->buttons.first; otherbut; otherbut = otherbut->next) {
+				if (!otherbut->active) {
 					// OK, so we know this isn't the main button we just picked.
 					// Can we pull some properties out of this and determine exactly what it is?
-					otherbut = but2;
-
-					PointerRNA *r_ptr;
-					PropertyRNA **r_prop;
-					int *r_index;
-
 					if (otherbut && otherbut->rnapoin.data) {
-/*						*r_ptr = otherbut->rnapoin;
-						*r_prop = otherbut->rnaprop;
-						*r_index = otherbut->rnaindex;
-*/
+
 						PointerRNA otherptr = otherbut->rnapoin;
 						PropertyRNA *otherprop = otherbut->rnaprop;
 						int otherindex = otherbut->rnaindex;
@@ -2015,140 +1958,24 @@ static int insert_recursive_key_button_exec(bContext *C, wmOperator *op)
 						// Make sure we're dealing with the same sort of keyframe (hide, hide_select, hide_render)
 						if (!memcmp(otherprop->identifier, prop->identifier, 11)) {
 							// OK, now make sure this is a child of the original thing we clicked on.
-
-//							restrictbutton_recursive_child(C, scene, ob, OB_RESTRICT_RENDER,
-//								(ob->restrictflag & OB_RESTRICT_RENDER) != 0, false, "hide_render");
-
-//							bContext *C, Scene *scene, Object *ob_parent, char flag,  bool state, bool deselect, const char *rnapropname)
-
-							Main *bmain = CTX_data_main(C);
-							Object *ob;
-
+							// First, let's find the object equivalent of this.
 							for (ob = bmain->object.first; ob; ob = ob->id.next) {
-								int a = 0; 
-								a++;
-/*								if (BKE_object_is_child_recursive(ob_parent, ob)) {
-									// only do if child object is selectable 
-									{
-										if (state) {
-											ob->restrictflag |= flag;
-											if (deselect) {
-												ED_base_object_select(BKE_scene_base_find(scene, ob), BA_DESELECT);
-											}
-										}
-										else {
-											ob->restrictflag &= ~flag;
-										}
+								if (0 == strcmp(ob->id.name, ((ID*)(otherptr.id.data))->name)) {
+									// Found it!
+									if (BKE_object_is_child_recursive(ob_parent, ob)) {
+										// Set this keyframe too.
+										success = set_custom_keyframe(C, op, otherptr, otherprop, otherbut, all, otherindex, flag);
+										if (!success) return OPERATOR_CANCELLED;
 									}
-
-									if (rnapropname) {
-										PointerRNA ptr;
-										PropertyRNA *prop;
-										ID *id;
-										bAction *action;
-										FCurve *fcu;
-										bool driven, special;
-
-										RNA_id_pointer_create(&ob->id, &ptr);
-										prop = RNA_struct_find_property(&ptr, rnapropname);
-										fcu = rna_get_fcurve_context_ui(C, &ptr, prop, 0, NULL, &action, &driven, &special);
-
-										if (fcu && !driven) {
-											id = ptr.id.data;
-											if (autokeyframe_cfra_can_key(scene, id)) {
-												ReportList *reports = CTX_wm_reports(C);
-												ToolSettings *ts = scene->toolsettings;
-												eInsertKeyFlags key_flag = ANIM_get_keyframing_flags(scene, 1);
-
-												fcu->flag &= ~FCURVE_SELECTED;
-												insert_keyframe(reports, id, action, ((fcu->grp) ? (fcu->grp->name) : (NULL)),
-													fcu->rna_path, fcu->array_index, CFRA, ts->keyframe_type, key_flag);
-												// Assuming this is not necessary here, since 'ancestor' object button will do it anyway. 
-												// WM_event_add_notifier(C, NC_ANIMATION | ND_KEYFRAME | NA_EDITED, NULL); 
-											}
-										}
-									}
-								}
-								*/
-							}
-
-
-							/*
-							// check all other button links 
-							uiBlock *block2;
-							uiBut *oldbut;
-							uiLinkLine *line;
-							uiBut *but3;
-
-							for (block2 = ar->uiblocks.first; block2; block2 = block2->next) {
-								for (but3 = block2->buttons.first; but3; but3 = but3->next) {
-									if (but3 != otherbut && !but3->active && but3->type == UI_BTYPE_LINK && but3->link) {
-										for (line = but3->link->lines.first; line; line = line->next) {
-																					if (line->to == newbut)
-																						line->to = oldbut;
-																						if (line->from == newbut)
-																						line->from = oldbut;
-											
-											int a = 0;
-											a++;
-										}
-									}
+									break; 
 								}
 							}
-*/
-
-							// Set this keyframe too.
-							success = set_custom_keyframe(C, op, otherptr, otherprop, otherbut, all, otherindex, flag);
-							if (!success) return OPERATOR_CANCELLED;
 						}
-
 					}
-/*					else {
-						memset(r_ptr, 0, sizeof(*r_ptr));
-						*r_prop = NULL;
-						*r_index = 0;
-					}
-*/
-
 				}
-//				else if (!activebut && (but2->flag & UI_BUT_LAST_ACTIVE))
-//					otherbut = but2;
 			}
 		}
-
-		/*
-		if (activebut && (but_check_cb == NULL || but_check_cb(activebut))) {
-			uiHandleButtonData *data = activebut->active;
-
-			but_found = activebut;
-
-			// recurse into opened menu, like colorpicker case 
-			if (data && data->menu && (ar != data->menu->region)) {
-				ar = data->menu->region;
-			}
-			else {
-				return but_found;
-			}
-		}
-		else {
-			// no active button 
-			return but_found;
-		}
-		*/
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 	if (success) {
 		/* send updates */

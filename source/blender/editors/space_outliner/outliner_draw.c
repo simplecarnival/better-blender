@@ -181,7 +181,8 @@ static void restrictbutton_recursive_child(bContext *C, Scene *scene, Object *ob
 		if (BKE_object_is_child_recursive(ob_parent, ob)) {
 			/* only do if child object is selectable */
 			////////// BETTER BLENDER BEGIN: PARENT TOGGLE CHANGES CHILDREN //////////
-//			if ((flag == OB_RESTRICT_SELECT) || (ob->restrictflag & OB_RESTRICT_SELECT) == 0) {
+//			if ((flag == OB_RESTRICT_SELECT) || (ob->restrictflag & OB_RESTRICT_SELECT) == 0) {	
+
 			{
 			////////// BETTER BLENDER END ////////// 
 				if (state) {
@@ -248,7 +249,7 @@ static void restrictbutton_view_cb(bContext *C, void *poin, void *poin2)
 
 	if (!(CTX_wm_window(C)->eventstate->ctrl)) {
 		restrictbutton_recursive_child(C, scene, ob, OB_RESTRICT_VIEW,
-			(ob->restrictflag & OB_RESTRICT_VIEW) != 0, true, "hide");
+			(ob->restrictflag & OB_RESTRICT_VIEW) != 0, true, "hide", 0);
 	}
 	////////// BETTER BLENDER END ////////// 
 	WM_event_add_notifier(C, NC_SCENE | ND_OB_SELECT, scene);
@@ -277,7 +278,7 @@ static void restrictbutton_sel_cb(bContext *C, void *poin, void *poin2)
 
 	if (!(CTX_wm_window(C)->eventstate->ctrl)) {
 		restrictbutton_recursive_child(C, scene, ob, OB_RESTRICT_SELECT,
-			(ob->restrictflag & OB_RESTRICT_SELECT) != 0, true, NULL);
+			(ob->restrictflag & OB_RESTRICT_SELECT) != 0, true, NULL, 0);
 	}
 	////////// BETTER BLENDER END ////////// 
 	WM_event_add_notifier(C, NC_SCENE | ND_OB_SELECT, scene);
@@ -293,12 +294,12 @@ static void restrictbutton_rend_cb(bContext *C, void *poin, void *poin2)
 //		restrictbutton_recursive_child(C, (Scene *)poin, ob, OB_RESTRICT_RENDER,
 //		                               (ob->restrictflag & OB_RESTRICT_RENDER) != 0, false, "hide_render");
 //	}
-
+	
 	if (!(CTX_wm_window(C)->eventstate->ctrl)) {
 		restrictbutton_recursive_child(C, (Scene *)poin, ob, OB_RESTRICT_RENDER,
-			(ob->restrictflag & OB_RESTRICT_RENDER) != 0, false, "hide_render");
+			(ob->restrictflag & OB_RESTRICT_RENDER) != 0, false, "hide_render", 0);
 	}
-	////////// BETTER BLENDER END ////////// 
+	////////// BETTER BLENDER END ////////// 	
 	WM_event_add_notifier(C, NC_SCENE | ND_OB_RENDER, poin);
 }
 
