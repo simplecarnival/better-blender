@@ -1988,58 +1988,6 @@ static int insert_recursive_key_button_exec(bContext *C, wmOperator *op)
 	return (success) ? OPERATOR_FINISHED : OPERATOR_CANCELLED;
 }
 
-static void restrictbutton_recursive_child(bContext *C, Scene *scene, Object *ob_parent, char flag,
-	bool state, bool deselect, const char *rnapropname)
-{
-	Main *bmain = CTX_data_main(C);
-	Object *ob;
-
-	for (ob = bmain->object.first; ob; ob = ob->id.next) {
-		if (BKE_object_is_child_recursive(ob_parent, ob)) {
-			/* only do if child object is selectable */
-			{
-				if (state) {
-					ob->restrictflag |= flag;
-					if (deselect) {
-						ED_base_object_select(BKE_scene_base_find(scene, ob), BA_DESELECT);
-					}
-				}
-				else {
-					ob->restrictflag &= ~flag;
-				}
-			}
-
-			if (rnapropname) {
-				PointerRNA ptr;
-				PropertyRNA *prop;
-				ID *id;
-				bAction *action;
-				FCurve *fcu;
-				bool driven, special;
-
-				RNA_id_pointer_create(&ob->id, &ptr);
-				prop = RNA_struct_find_property(&ptr, rnapropname);
-				fcu = rna_get_fcurve_context_ui(C, &ptr, prop, 0, NULL, &action, &driven, &special);
-
-				if (fcu && !driven) {
-					id = ptr.id.data;
-					if (autokeyframe_cfra_can_key(scene, id)) {
-						ReportList *reports = CTX_wm_reports(C);
-						ToolSettings *ts = scene->toolsettings;
-						eInsertKeyFlags key_flag = ANIM_get_keyframing_flags(scene, 1);
-
-						fcu->flag &= ~FCURVE_SELECTED;
-						insert_keyframe(reports, id, action, ((fcu->grp) ? (fcu->grp->name) : (NULL)),
-							fcu->rna_path, fcu->array_index, CFRA, ts->keyframe_type, key_flag);
-						/* Assuming this is not necessary here, since 'ancestor' object button will do it anyway. */
-						/* WM_event_add_notifier(C, NC_ANIMATION | ND_KEYFRAME | NA_EDITED, NULL); */
-					}
-				}
-			}
-		}
-	}
-}
-
 ////////// BETTER BLENDER END //////////
 
 
@@ -2067,7 +2015,7 @@ void ANIM_OT_keyframe_recursive_insert_button(wmOperatorType *ot)
 	/* identifiers */
 	ot->name = "Insert Recursive Keyframes (Buttons)";
 	ot->idname = "ANIM_OT_keyframe_recursive_insert_button";
-	ot->description = "Recusrively insert keyframes for current UI-active property and everything that inherits from it";
+	ot->description = "Recursively insert keyframes for current UI-active property and everything that inherits from it";
 
 	/* callbacks */
 	ot->exec = insert_recursive_key_button_exec;
@@ -2077,7 +2025,7 @@ void ANIM_OT_keyframe_recursive_insert_button(wmOperatorType *ot)
 	ot->flag = OPTYPE_UNDO | OPTYPE_INTERNAL;
 
 	/* properties */
-	RNA_def_boolean(ot->srna, "all", 1, "All", "Recursively insert keyframes for all element of the array");
+	RNA_def_boolean(ot->srna, "all", 1, "All", "Recursively insert keyframes for all elements of the array");
 }
 ////////// BETTER BLENDER END //////////
 
@@ -2164,6 +2112,170 @@ static int delete_key_button_exec(bContext *C, wmOperator *op)
 	return (success) ? OPERATOR_FINISHED : OPERATOR_CANCELLED;
 }
 
+////////// BETTER BLENDER BEGIN: INSERT KEYFRAMES RECURSIVE //////////
+static short does_keyframe_exist(ReportList *reports, ID *id, bAction *act, const char group[], const char rna_path[], int array_index, float cfra, short UNUSED(flag))
+{
+	AnimData *adt = BKE_animdata_from_id(id);
+	PointerRNA id_ptr, ptr;
+	PropertyRNA *prop;
+	int array_index_max = array_index + 1;
+	int ret = 0;
+
+	/* sanity checks */
+	if (ELEM(NULL, id, adt)) {
+		return 0;
+	}
+
+	/* validate pointer first - exit if failure */
+	RNA_id_pointer_create(id, &id_ptr);
+	if (RNA_path_resolve_property(&id_ptr, rna_path, &ptr, &prop) == false) {
+		return 0;
+	}
+
+	/* get F-Curve
+	* Note: here is one of the places where we don't want new Action + F-Curve added!
+	*      so 'add' var must be 0
+	*/
+	if (act == NULL) {
+		/* if no action is provided, use the default one attached to this ID-block
+		*  - if it doesn't exist, then we're out of options...
+		*/
+		if (adt->action) {
+			return 1;
+		}
+		else {
+			return 0;
+		}
+	}
+
+	return 0;
+}
+
+static int delete_custom_keyframe(bContext *C, wmOperator *op, PointerRNA ptr, PropertyRNA *prop, uiBut *but, bool all, int index) {
+	Scene *scene = CTX_data_scene(C);
+	ToolSettings *ts = scene->toolsettings;
+	char *path;
+	short success = 0;
+	float cfra = (float)CFRA;
+
+	if (ptr.id.data && ptr.data && prop) {
+		if (ptr.type != &RNA_NlaStrip) {
+			/* standard properties */
+			path = RNA_path_from_ID_to_property(&ptr, prop);
+
+			if (path) {
+				if (all) {
+					/* -1 indicates operating on the entire array (or the property itself otherwise) */
+					index = -1;
+				}
+
+				// Before we attempt to try to delete the keyframe, make sure there is actually something there that can be deleted.
+				if (does_keyframe_exist(op->reports, ptr.id.data, NULL, NULL, path, index, cfra, 0)) {
+					success = delete_keyframe(op->reports, ptr.id.data, NULL, NULL, path, index, cfra, 0);
+				}
+				else {
+					success = 1; // Yes, if no keyframe exists, we're still good.
+				}
+				MEM_freeN(path);
+			}
+			else if (G.debug & G_DEBUG)
+				printf("Button Delete-Key: no path to property\n");
+		}
+	}
+	else if (G.debug & G_DEBUG) {
+		printf("ptr.data = %p, prop = %p\n", (void *)ptr.data, (void *)prop);
+	}
+
+	return success;
+}
+
+
+static int delete_recursive_key_button_exec(bContext *C, wmOperator *op)
+{
+	Scene *scene = CTX_data_scene(C);
+	PointerRNA ptr = { { NULL } };
+	PropertyRNA *prop = NULL;
+	uiBut *but;	
+	short success = 0;
+	int index;
+	const bool all = RNA_boolean_get(op->ptr, "all");
+
+	/* try to insert keyframe using property retrieved from UI */
+	but = UI_context_active_but_get(C);
+	UI_context_active_but_prop_get(C, &ptr, &prop, &index);
+
+	// The name we clicked is ((ID*)(ptr.id.data))->name
+
+	// Delete the keyframe that we actually clicked on.
+	success = delete_custom_keyframe(C, op, ptr, prop, but, all, index);
+	if (!success) return OPERATOR_CANCELLED;
+
+	// Now look around for child objects to delete keyframes on.
+
+	uiBut *but_found = NULL;
+	ARegion *ar = CTX_wm_region(C);
+
+	if (ar) {
+		uiBlock *block;
+		uiBut *otherbut = NULL;
+		Main *bmain = CTX_data_main(C);
+
+		// Find the object that we just clicked so we can set our parent object.
+		Object *ob;
+		Object *ob_parent;
+		for (ob = bmain->object.first; ob; ob = ob->id.next) {
+			if (0 == strcmp(ob->id.name, ((ID*)(ptr.id.data))->name)) {
+				// Found it!
+				ob_parent = ob;
+				break;
+			}
+		}
+
+		for (block = ar->uiblocks.first; block; block = block->next) {
+			for (otherbut = block->buttons.first; otherbut; otherbut = otherbut->next) {
+				if (!otherbut->active) {
+					// OK, so we know this isn't the main button we just picked.
+					// Can we pull some properties out of this and determine exactly what it is?
+					if (otherbut && otherbut->rnapoin.data) {
+
+						PointerRNA otherptr = otherbut->rnapoin;
+						PropertyRNA *otherprop = otherbut->rnaprop;
+						int otherindex = otherbut->rnaindex;
+
+						// Make sure we're dealing with the same sort of keyframe (hide, hide_select, hide_render)
+						if (!memcmp(otherprop->identifier, prop->identifier, 11)) {
+							// OK, now make sure this is a child of the original thing we clicked on.
+							// First, let's find the object equivalent of this.
+							for (ob = bmain->object.first; ob; ob = ob->id.next) {
+								if (0 == strcmp(ob->id.name, ((ID*)(otherptr.id.data))->name)) {
+									// Found it!
+									if (BKE_object_is_child_recursive(ob_parent, ob)) {
+										// Set this keyframe too.
+										success = delete_custom_keyframe(C, op, otherptr, otherprop, otherbut, all, otherindex);
+										if (!success) return OPERATOR_CANCELLED;
+									}
+									break;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if (success) {
+		/* send updates */
+		UI_context_update_anim_flag(C);
+
+		/* send notifiers that keyframes have been changed */
+		WM_event_add_notifier(C, NC_ANIMATION | ND_KEYFRAME | NA_REMOVED, NULL);
+	}
+
+	return (success) ? OPERATOR_FINISHED : OPERATOR_CANCELLED;
+}
+////////// BETTER BLENDER END ////////// 
+
 void ANIM_OT_keyframe_delete_button(wmOperatorType *ot)
 {
 	/* identifiers */
@@ -2182,6 +2294,25 @@ void ANIM_OT_keyframe_delete_button(wmOperatorType *ot)
 	RNA_def_boolean(ot->srna, "all", 1, "All", "Delete keyframes from all elements of the array");
 }
 
+////////// BETTER BLENDER BEGIN: INSERT KEYFRAMES RECURSIVE //////////
+void ANIM_OT_keyframe_recursive_delete_button(wmOperatorType *ot)
+{
+	/* identifiers */
+	ot->name = "Delete Recursive Keyframe (Buttons)";
+	ot->idname = "ANIM_OT_keyframe_recursive_delete_button";
+	ot->description = "Recursively delete keyframes of current UI-active property and everything that inherits from it";
+
+	/* callbacks */
+	ot->exec = delete_recursive_key_button_exec;
+	ot->poll = modify_key_op_poll;
+
+	/* flags */
+	ot->flag = OPTYPE_UNDO | OPTYPE_INTERNAL;
+
+	/* properties */
+	RNA_def_boolean(ot->srna, "all", 1, "All", "Recursively delete keyframes from all elements of the array");
+}
+////////// BETTER BLENDER END //////////
 
 /* Clear Key Button Operator ------------------------ */
 
