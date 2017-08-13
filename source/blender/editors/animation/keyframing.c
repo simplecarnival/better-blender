@@ -1863,24 +1863,22 @@ static int set_custom_keyframe(bContext *C, wmOperator *op, PointerRNA ptr, Prop
 	float cfra = (float)CFRA;
 
 	if ((ptr.id.data && ptr.data && prop) && RNA_property_animateable(&ptr, prop)) {
-		if (ptr.type != &RNA_NlaStrip && !UI_but_flag_is_set(but, UI_BUT_DRIVEN)) {
-			/* standard properties */
-			path = RNA_path_from_ID_to_property(&ptr, prop);
+		/* standard properties */
+		path = RNA_path_from_ID_to_property(&ptr, prop);
 
-			if (path) {
-				if (all) {
-					/* -1 indicates operating on the entire array (or the property itself otherwise) */
-					index = -1;
-				}
+		if (path) {
+			if (all) {
+				/* -1 indicates operating on the entire array (or the property itself otherwise) */
+				index = -1;
+			}
 
-				success = insert_keyframe(op->reports, ptr.id.data, NULL, NULL, path, index, cfra, ts->keyframe_type, flag);
-				MEM_freeN(path);
-			}
-			else {
-				BKE_report(op->reports, RPT_WARNING,
-					"Failed to resolve path to property, "
-					"try manually specifying this using a Keying Set instead");
-			}
+			success = insert_keyframe(op->reports, ptr.id.data, NULL, NULL, path, index, cfra, ts->keyframe_type, flag);
+			MEM_freeN(path);
+		}
+		else {
+			BKE_report(op->reports, RPT_WARNING,
+				"Failed to resolve path to property, "
+				"try manually specifying this using a Keying Set instead");
 		}
 	}
 	else {
@@ -1924,105 +1922,48 @@ static int insert_recursive_key_button_exec(bContext *C, wmOperator *op)
 	if (!success) return OPERATOR_CANCELLED;
 
 	// Now look around for child objects to set keyframes on.
-
 	uiBut *but_found = NULL;
-//	ARegion *ar = CTX_wm_region(C);
+	uiBlock *block;
+	uiBut *otherbut = NULL;
+	Main *bmain = CTX_data_main(C);
 
-//	if (ar) 
-	{
-		uiBlock *block;
-		uiBut *otherbut = NULL;
-		Main *bmain = CTX_data_main(C);
-
-		// Find the object that we just clicked so we can set our parent object.
-		Object *ob;
-		Object *ob_parent;
-		for (ob = bmain->object.first; ob; ob = ob->id.next) {
-			if (0 == strcmp(ob->id.name, ((ID*)(ptr.id.data))->name)) {
-				// Found it!
-				ob_parent = ob;
-				break;
-			}
+	// Find the object that we just clicked so we can set our parent object.
+	Object *ob;
+	Object *ob_parent;
+	for (ob = bmain->object.first; ob; ob = ob->id.next) {
+		if (0 == strcmp(ob->id.name, ((ID*)(ptr.id.data))->name)) {
+			// Found it!
+			ob_parent = ob;
+			break;
 		}
+	}
 
-		/*
-		// Now look through all of the other objects and see which ones are child objects.
-		for (ob = bmain->object.first; ob; ob = ob->id.next) {
-			// Make sure we're not looking at the parent object.
-			if (0 != strcmp(ob->id.name, ob_parent->id.name)) {
-				if (BKE_object_is_child_recursive(ob_parent, ob)) {
-					// OK, create the keyframe.
-					// set_custom_keyframe(bContext *C, wmOperator *op, PointerRNA ptr, PropertyRNA *prop, uiBut *but, bool all, int index, short flag) {
-					Scene *scene = CTX_data_scene(C);
-					ToolSettings *ts = scene->toolsettings;
-					char *path;
-					short success = 0;
-					float cfra = (float)CFRA;
+	// Now look through all of the other objects and see which ones are child objects.
+	for (ob = bmain->object.first; ob; ob = ob->id.next) {
+		// Make sure we're not looking at the parent object.
+		if (0 != strcmp(ob->id.name, ob_parent->id.name)) {
+			if (BKE_object_is_child_recursive(ob_parent, ob)) {
+				// OK, create the keyframe.
+				PointerRNA otherptr;
+				PropertyRNA *otherprop;
+				ID *id;
+				bAction *action;
+				FCurve *fcu;
+				bool driven, special;
 
-					path = RNA_path_from_ID_to_property(&ptr, prop);
+				RNA_id_pointer_create(&ob->id, &otherptr);
+				otherprop = RNA_struct_find_property(&otherptr, prop->identifier); // The identifier determines which kind of keyframe (hide, hide_select, hide_render)
 
-					success = insert_keyframe(op->reports, ptr.id.data, NULL, NULL, path, -1, cfra, ts->keyframe_type, flag);
-					MEM_freeN(path);
-				}
-				else {
-					BKE_report(op->reports, RPT_WARNING,
-						"Failed to resolve path to property, "
-						"try manually specifying this using a Keying Set instead");
-				}
-*/
-
-/*					PointerRNA otherptr = ob->data;
-					PropertyRNA *otherprop = ob->rnaprop;
-					int otherindex = otherbut->rnaindex;
-
-					PointerRNA otherptr = otherbut->rnapoin;
-					typedef struct PointerRNA {
-						struct {
-							void *data;
-						} id;
-*/
-
-//					PropertyRNA *otherprop = otherbut->rnaprop;
-//					int otherindex = otherbut->rnaindex;
-
-					// Set this keyframe too.
-//					success = set_custom_keyframe(C, op, otherptr, otherprop, otherbut, all, otherindex, flag);
-//					if (!success) return OPERATOR_CANCELLED;
-/*				}
-				break;
-			}
-		}
-*/
-
-
-		for (block = ar->uiblocks.first; block; block = block->next) {
-			for (otherbut = block->buttons.first; otherbut; otherbut = otherbut->next) {
-				if (!otherbut->active) {
-					// OK, so we know this isn't the main button we just picked.
-					// Can we pull some properties out of this and determine exactly what it is?
-					if (otherbut && otherbut->rnapoin.data) {
-						PointerRNA otherptr = otherbut->rnapoin; 
-						PropertyRNA *otherprop = otherbut->rnaprop;
-						int otherindex = otherbut->rnaindex;
-
-						// Make sure we're dealing with the same sort of keyframe (hide, hide_select, hide_render)
-						if (!memcmp(otherprop->identifier, prop->identifier, 11)) {
-							// OK, now make sure this is a child of the original thing we clicked on.
-							// First, let's find the object equivalent of this.
-							for (ob = bmain->object.first; ob; ob = ob->id.next) {
-								if (0 == strcmp(ob->id.name, ((ID*)(otherptr.id.data))->name)) {
-									// Found it!
-									if (BKE_object_is_child_recursive(ob_parent, ob)) {
-										// Set this keyframe too.
-										success = set_custom_keyframe(C, op, otherptr, otherprop, otherbut, all, otherindex, flag);
-										if (!success) return OPERATOR_CANCELLED;
-									}
-									break; 
-								}
-							}
-						}
+				int otherindex = 0;				
+				PropertyRNA *indexProp = RNA_struct_find_property(op->ptr, "index"); // TODO: I don't think this is the correct way to figure out how to get the index, but it also doesn't seem to matter
+				if (indexProp) {
+					if (RNA_property_is_set(op->ptr, indexProp)) {
+						otherindex = RNA_property_int_get(op->ptr, indexProp);
 					}
 				}
+
+				success = set_custom_keyframe(C, op, otherptr, otherprop, otherbut, all, otherindex, flag);
+				if (!success) return OPERATOR_CANCELLED;
 			}
 		}
 	}
@@ -2209,28 +2150,26 @@ static int delete_custom_keyframe(bContext *C, wmOperator *op, PointerRNA ptr, P
 	float cfra = (float)CFRA;
 
 	if (ptr.id.data && ptr.data && prop) {
-		if (ptr.type != &RNA_NlaStrip) {
-			/* standard properties */
-			path = RNA_path_from_ID_to_property(&ptr, prop);
+		/* standard properties */
+		path = RNA_path_from_ID_to_property(&ptr, prop);
 
-			if (path) {
-				if (all) {
-					/* -1 indicates operating on the entire array (or the property itself otherwise) */
-					index = -1;
-				}
-
-				// Before we attempt to try to delete the keyframe, make sure there is actually something there that can be deleted.
-				if (does_keyframe_exist(op->reports, ptr.id.data, NULL, NULL, path, index, cfra, 0)) {
-					success = delete_keyframe(op->reports, ptr.id.data, NULL, NULL, path, index, cfra, 0);
-				}
-				else {
-					success = 1; // Yes, if no keyframe exists, we're still good.
-				}
-				MEM_freeN(path);
+		if (path) {
+			if (all) {
+				/* -1 indicates operating on the entire array (or the property itself otherwise) */
+				index = -1;
 			}
-			else if (G.debug & G_DEBUG)
-				printf("Button Delete-Key: no path to property\n");
+
+			// Before we attempt to try to delete the keyframe, make sure there is actually something there that can be deleted.
+			if (does_keyframe_exist(op->reports, ptr.id.data, NULL, NULL, path, index, cfra, 0)) {
+				success = delete_keyframe(op->reports, ptr.id.data, NULL, NULL, path, index, cfra, 0);
+			}
+			else {
+				success = 1; // Yes, if no keyframe exists, we're still good.
+			}
+			MEM_freeN(path);
 		}
+		else if (G.debug & G_DEBUG)
+			printf("Button Delete-Key: no path to property\n");
 	}
 	else if (G.debug & G_DEBUG) {
 		printf("ptr.data = %p, prop = %p\n", (void *)ptr.data, (void *)prop);
@@ -2260,75 +2199,51 @@ static int delete_recursive_key_button_exec(bContext *C, wmOperator *op)
 	success = delete_custom_keyframe(C, op, ptr, prop, but, all, index);
 	if (!success) return OPERATOR_CANCELLED;
 
-	// Now look around for child objects to delete keyframes on.
-
+	// Now look around for child objects to set keyframes on.
 	uiBut *but_found = NULL;
-	ARegion *ar = CTX_wm_region(C);
+	uiBlock *block;
+	uiBut *otherbut = NULL;
+	Main *bmain = CTX_data_main(C);
 
-	if (ar) {
-		uiBlock *block;
-		uiBut *otherbut = NULL;
-		Main *bmain = CTX_data_main(C);
-
-		// Find the object that we just clicked so we can set our parent object.
-		Object *ob;
-		Object *ob_parent;
-		for (ob = bmain->object.first; ob; ob = ob->id.next) {
-			if (0 == strcmp(ob->id.name, ((ID*)(ptr.id.data))->name)) {
-				// Found it!
-				ob_parent = ob;
-				break;
-			}
+	// Find the object that we just clicked so we can set our parent object.
+	Object *ob;
+	Object *ob_parent;
+	for (ob = bmain->object.first; ob; ob = ob->id.next) {
+		if (0 == strcmp(ob->id.name, ((ID*)(ptr.id.data))->name)) {
+			// Found it!
+			ob_parent = ob;
+			break;
 		}
-		/*
-		// Now look through all of the other objects and see which ones are child objects.
-		for (ob = bmain->object.first; ob; ob = ob->id.next) {
-			// Make sure we're not looking at the parent object.
-			if (0 != strcmp(ob->id.name, ob_parent->id.name)) {
-				if (BKE_object_is_child_recursive(ob_parent, ob)) {
-					// Set this keyframe too.
-					success = delete_custom_keyframe(C, op, otherptr, otherprop, otherbut, all, otherindex);
-					if (!success) return OPERATOR_CANCELLED;
-				}
-				break;
-			}
-		}
-		*/
+	}
 
+	// Now look through all of the other objects and see which ones are child objects.
+	for (ob = bmain->object.first; ob; ob = ob->id.next) {
+		// Make sure we're not looking at the parent object.
+		if (0 != strcmp(ob->id.name, ob_parent->id.name)) {
+			if (BKE_object_is_child_recursive(ob_parent, ob)) {
+				// OK, create the keyframe.
+				PointerRNA otherptr;
+				PropertyRNA *otherprop;
+				ID *id;
+				bAction *action;
+				FCurve *fcu;
+				bool driven, special;
 
-		/*
-		for (block = ar->uiblocks.first; block; block = block->next) {
-			for (otherbut = block->buttons.first; otherbut; otherbut = otherbut->next) {
-				if (!otherbut->active) {
-					// OK, so we know this isn't the main button we just picked.
-					// Can we pull some properties out of this and determine exactly what it is?
-					if (otherbut && otherbut->rnapoin.data) {
+				RNA_id_pointer_create(&ob->id, &otherptr);
+				otherprop = RNA_struct_find_property(&otherptr, prop->identifier); // The identifier determines which kind of keyframe (hide, hide_select, hide_render)
 
-						PointerRNA otherptr = otherbut->rnapoin;
-						PropertyRNA *otherprop = otherbut->rnaprop;
-						int otherindex = otherbut->rnaindex;
-
-						// Make sure we're dealing with the same sort of keyframe (hide, hide_select, hide_render)
-						if (!memcmp(otherprop->identifier, prop->identifier, 11)) {
-							// OK, now make sure this is a child of the original thing we clicked on.
-							// First, let's find the object equivalent of this.
-							for (ob = bmain->object.first; ob; ob = ob->id.next) {
-								if (0 == strcmp(ob->id.name, ((ID*)(otherptr.id.data))->name)) {
-									// Found it!
-									if (BKE_object_is_child_recursive(ob_parent, ob)) {
-										// Set this keyframe too.
-										success = delete_custom_keyframe(C, op, otherptr, otherprop, otherbut, all, otherindex);
-										if (!success) return OPERATOR_CANCELLED;
-									}
-									break;
-								}
-							}
-						}
+				int otherindex = 0;
+				PropertyRNA *indexProp = RNA_struct_find_property(op->ptr, "index"); // TODO: I don't think this is the correct way to figure out how to get the index, but it also doesn't seem to matter
+				if (indexProp) {
+					if (RNA_property_is_set(op->ptr, indexProp)) {
+						otherindex = RNA_property_int_get(op->ptr, indexProp);
 					}
 				}
+
+				success = delete_custom_keyframe(C, op, otherptr, otherprop, otherbut, all, otherindex);
+				if (!success) return OPERATOR_CANCELLED;
 			}
 		}
-		*/
 	}
 
 	if (success) {
