@@ -388,11 +388,11 @@ void ED_operatortypes_anim(void)
 	WM_operatortype_append(ANIM_OT_keyframe_delete_v3d);
 	WM_operatortype_append(ANIM_OT_keyframe_clear_v3d);
 	WM_operatortype_append(ANIM_OT_keyframe_insert_button);
-	////////// BETTER BLENDER BEGIN: INSERT KEYFRAMES RECURSIVE //////////
+	////////// BETTER BLENDER BEGIN: INSERT RECURSIVE KEYFRAMES //////////
 	WM_operatortype_append(ANIM_OT_keyframe_recursive_insert_button);
 	////////// BETTER BLENDER END //////////
 	WM_operatortype_append(ANIM_OT_keyframe_delete_button);
-	////////// BETTER BLENDER BEGIN: INSERT KEYFRAMES RECURSIVE //////////
+	////////// BETTER BLENDER BEGIN: INSERT RECURSIVE KEYFRAMES //////////
 	WM_operatortype_append(ANIM_OT_keyframe_recursive_delete_button);
 	////////// BETTER BLENDER END //////////
 	WM_operatortype_append(ANIM_OT_keyframe_clear_button);

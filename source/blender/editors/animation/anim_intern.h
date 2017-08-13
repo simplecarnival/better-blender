@@ -56,7 +56,7 @@ void ANIM_OT_keyframe_clear_v3d(struct wmOperatorType *ot);
 
 /* Keyframe management operators for UI buttons (RMB menu). */
 void ANIM_OT_keyframe_insert_button(struct wmOperatorType *ot);
-////////// BETTER BLENDER BEGIN: INSERT KEYFRAMES RECURSIVE //////////
+////////// BETTER BLENDER BEGIN: INSERT RECURSIVE KEYFRAMES //////////
 void ANIM_OT_keyframe_recursive_insert_button(struct wmOperatorType *ot);
 void ANIM_OT_keyframe_recursive_delete_button(struct wmOperatorType *ot);
 ////////// BETTER BLENDER END //////////

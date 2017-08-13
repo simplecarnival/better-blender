@@ -6722,13 +6722,13 @@ static bool ui_but_menu(bContext *C, uiBut *but)
 			else {
 				uiItemBooleanO(layout, CTX_IFACE_(BLT_I18NCONTEXT_OPERATOR_DEFAULT, "Replace Keyframe"),
 				               ICON_KEY_HLT, "ANIM_OT_keyframe_insert_button", "all", 1);
-				////////// BETTER BLENDER BEGIN: INSERT KEYFRAMES RECURSIVE //////////
+				////////// BETTER BLENDER BEGIN: INSERT RECURSIVE KEYFRAMES //////////
 				uiItemBooleanO(layout, CTX_IFACE_(BLT_I18NCONTEXT_OPERATOR_DEFAULT, "Replace Recursive Keyframes"),
 					ICON_KEY_HLT, "ANIM_OT_keyframe_recursive_insert_button", "all", 1);
 				////////// BETTER BLENDER END //////////
 				uiItemBooleanO(layout, CTX_IFACE_(BLT_I18NCONTEXT_OPERATOR_DEFAULT, "Delete Keyframe"),
 				               ICON_NONE, "ANIM_OT_keyframe_delete_button", "all", 1);
-				////////// BETTER BLENDER BEGIN: INSERT KEYFRAMES RECURSIVE //////////
+				////////// BETTER BLENDER BEGIN: INSERT RECURSIVE KEYFRAMES //////////
 				uiItemBooleanO(layout, CTX_IFACE_(BLT_I18NCONTEXT_OPERATOR_DEFAULT, "Delete Recursive Keyframes"),
 					ICON_NONE, "ANIM_OT_keyframe_recursive_delete_button", "all", 1);
 				////////// BETTER BLENDER END //////////
@@ -6752,7 +6752,7 @@ static bool ui_but_menu(bContext *C, uiBut *but)
 			else {
 				uiItemBooleanO(layout, CTX_IFACE_(BLT_I18NCONTEXT_OPERATOR_DEFAULT, "Insert Keyframe"),
 				               ICON_KEY_HLT, "ANIM_OT_keyframe_insert_button", "all", 1);
-				////////// BETTER BLENDER BEGIN: INSERT KEYFRAMES RECURSIVE //////////
+				////////// BETTER BLENDER BEGIN: INSERT RECURSIVE KEYFRAMES //////////
 				uiItemBooleanO(layout, CTX_IFACE_(BLT_I18NCONTEXT_OPERATOR_DEFAULT, "Insert Recursive Keyframes"),
 					ICON_KEY_HLT, "ANIM_OT_keyframe_recursive_insert_button", "all", 1);
 				////////// BETTER BLENDER END //////////

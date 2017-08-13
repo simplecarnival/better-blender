@@ -59,7 +59,7 @@
 #include "BKE_depsgraph.h"
 #include "BKE_fcurve.h"
 #include "BKE_idcode.h"
-////////// BETTER BLENDER BEGIN: INSERT KEYFRAMES RECURSIVE //////////
+////////// BETTER BLENDER BEGIN: INSERT RECURSIVE KEYFRAMES //////////
 #include "BKE_main.h"
 #include "BKE_object.h"
 #include "BKE_modifier.h"
@@ -91,7 +91,7 @@
 
 #include "anim_intern.h"
 
-////////// BETTER BLENDER BEGIN: INSERT KEYFRAMES RECURSIVE //////////
+////////// BETTER BLENDER BEGIN: INSERT RECURSIVE KEYFRAMES //////////
 #include "../makesrna/intern/rna_internal_types.h"
 #include "../interface/interface_intern.h"
 ////////// BETTER BLENDER END ////////// 
@@ -1854,7 +1854,7 @@ static int insert_key_button_exec(bContext *C, wmOperator *op)
 	return (success) ? OPERATOR_FINISHED : OPERATOR_CANCELLED;
 }
 
-////////// BETTER BLENDER BEGIN: INSERT KEYFRAMES RECURSIVE //////////
+////////// BETTER BLENDER BEGIN: INSERT RECURSIVE KEYFRAMES //////////
 static int set_custom_keyframe(bContext *C, wmOperator *op, PointerRNA ptr, PropertyRNA *prop, uiBut *but, bool all, int index, short flag) {
 	Scene *scene = CTX_data_scene(C);
 	ToolSettings *ts = scene->toolsettings;
@@ -1926,9 +1926,10 @@ static int insert_recursive_key_button_exec(bContext *C, wmOperator *op)
 	// Now look around for child objects to set keyframes on.
 
 	uiBut *but_found = NULL;
-	ARegion *ar = CTX_wm_region(C);
+//	ARegion *ar = CTX_wm_region(C);
 
-	if (ar) {
+//	if (ar) 
+	{
 		uiBlock *block;
 		uiBut *otherbut = NULL;
 		Main *bmain = CTX_data_main(C);
@@ -1944,14 +1945,63 @@ static int insert_recursive_key_button_exec(bContext *C, wmOperator *op)
 			}
 		}
 
+		/*
+		// Now look through all of the other objects and see which ones are child objects.
+		for (ob = bmain->object.first; ob; ob = ob->id.next) {
+			// Make sure we're not looking at the parent object.
+			if (0 != strcmp(ob->id.name, ob_parent->id.name)) {
+				if (BKE_object_is_child_recursive(ob_parent, ob)) {
+					// OK, create the keyframe.
+					// set_custom_keyframe(bContext *C, wmOperator *op, PointerRNA ptr, PropertyRNA *prop, uiBut *but, bool all, int index, short flag) {
+					Scene *scene = CTX_data_scene(C);
+					ToolSettings *ts = scene->toolsettings;
+					char *path;
+					short success = 0;
+					float cfra = (float)CFRA;
+
+					path = RNA_path_from_ID_to_property(&ptr, prop);
+
+					success = insert_keyframe(op->reports, ptr.id.data, NULL, NULL, path, -1, cfra, ts->keyframe_type, flag);
+					MEM_freeN(path);
+				}
+				else {
+					BKE_report(op->reports, RPT_WARNING,
+						"Failed to resolve path to property, "
+						"try manually specifying this using a Keying Set instead");
+				}
+*/
+
+/*					PointerRNA otherptr = ob->data;
+					PropertyRNA *otherprop = ob->rnaprop;
+					int otherindex = otherbut->rnaindex;
+
+					PointerRNA otherptr = otherbut->rnapoin;
+					typedef struct PointerRNA {
+						struct {
+							void *data;
+						} id;
+*/
+
+//					PropertyRNA *otherprop = otherbut->rnaprop;
+//					int otherindex = otherbut->rnaindex;
+
+					// Set this keyframe too.
+//					success = set_custom_keyframe(C, op, otherptr, otherprop, otherbut, all, otherindex, flag);
+//					if (!success) return OPERATOR_CANCELLED;
+/*				}
+				break;
+			}
+		}
+*/
+
+
 		for (block = ar->uiblocks.first; block; block = block->next) {
 			for (otherbut = block->buttons.first; otherbut; otherbut = otherbut->next) {
 				if (!otherbut->active) {
 					// OK, so we know this isn't the main button we just picked.
 					// Can we pull some properties out of this and determine exactly what it is?
 					if (otherbut && otherbut->rnapoin.data) {
-
-						PointerRNA otherptr = otherbut->rnapoin;
+						PointerRNA otherptr = otherbut->rnapoin; 
 						PropertyRNA *otherprop = otherbut->rnaprop;
 						int otherindex = otherbut->rnaindex;
 
@@ -2009,7 +2059,7 @@ void ANIM_OT_keyframe_insert_button(wmOperatorType *ot)
 	RNA_def_boolean(ot->srna, "all", 1, "All", "Insert a keyframe for all element of the array");
 }
 
-////////// BETTER BLENDER BEGIN: INSERT KEYFRAMES RECURSIVE //////////
+////////// BETTER BLENDER BEGIN: INSERT RECURSIVE KEYFRAMES //////////
 void ANIM_OT_keyframe_recursive_insert_button(wmOperatorType *ot)
 {
 	/* identifiers */
@@ -2112,7 +2162,7 @@ static int delete_key_button_exec(bContext *C, wmOperator *op)
 	return (success) ? OPERATOR_FINISHED : OPERATOR_CANCELLED;
 }
 
-////////// BETTER BLENDER BEGIN: INSERT KEYFRAMES RECURSIVE //////////
+////////// BETTER BLENDER BEGIN: INSERT RECURSIVE KEYFRAMES //////////
 static short does_keyframe_exist(ReportList *reports, ID *id, bAction *act, const char group[], const char rna_path[], int array_index, float cfra, short UNUSED(flag))
 {
 	AnimData *adt = BKE_animdata_from_id(id);
@@ -2230,7 +2280,23 @@ static int delete_recursive_key_button_exec(bContext *C, wmOperator *op)
 				break;
 			}
 		}
+		/*
+		// Now look through all of the other objects and see which ones are child objects.
+		for (ob = bmain->object.first; ob; ob = ob->id.next) {
+			// Make sure we're not looking at the parent object.
+			if (0 != strcmp(ob->id.name, ob_parent->id.name)) {
+				if (BKE_object_is_child_recursive(ob_parent, ob)) {
+					// Set this keyframe too.
+					success = delete_custom_keyframe(C, op, otherptr, otherprop, otherbut, all, otherindex);
+					if (!success) return OPERATOR_CANCELLED;
+				}
+				break;
+			}
+		}
+		*/
 
+
+		/*
 		for (block = ar->uiblocks.first; block; block = block->next) {
 			for (otherbut = block->buttons.first; otherbut; otherbut = otherbut->next) {
 				if (!otherbut->active) {
@@ -2262,6 +2328,7 @@ static int delete_recursive_key_button_exec(bContext *C, wmOperator *op)
 				}
 			}
 		}
+		*/
 	}
 
 	if (success) {
@@ -2294,7 +2361,7 @@ void ANIM_OT_keyframe_delete_button(wmOperatorType *ot)
 	RNA_def_boolean(ot->srna, "all", 1, "All", "Delete keyframes from all elements of the array");
 }
 
-////////// BETTER BLENDER BEGIN: INSERT KEYFRAMES RECURSIVE //////////
+////////// BETTER BLENDER BEGIN: INSERT RECURSIVE KEYFRAMES //////////
 void ANIM_OT_keyframe_recursive_delete_button(wmOperatorType *ot)
 {
 	/* identifiers */
