@@ -1,7 +1,7 @@
 Better Blender
 ==============
 
-This Windows Blender 2.78c fork was created out of various frustrations I had with [Blender](www.blender.org), the 3D modeling/animation application.
+This Windows Blender 2.78c fork was created out of various frustrations I had with Blender, the 3D modeling/animation application.
 
 Most of these changes were related to usability issues that I had with the application. I made sure not to do anything that would change the file format, so any files created with this version of Blender will be compatible with the non-modified version of Blender 2.78c. (The only slight exception is the "Set Start Frame for Background Video" feature, which will behave differently in the non-modified version of Blender.)
 
