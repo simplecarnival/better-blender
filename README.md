@@ -9,11 +9,11 @@ Here are the changes:
 
 * **Obnoxious Headers:** Many of Blender's keyboard shortcuts depend on which window your mouse cursor is hovering over. Unfortunately, Blender does not make it very obvious which window your mouse cursor is hovering over, and if you have a large screen or two monitors, it's not always immediately obvious where your mouse cursor is. As a result, I've implemented "obnoxious headers" which, while not pretty, make it blatantly obvious where your mouse cursor is at all times.
 
-* **Eliminate Popup Boxes:** I found it to be a tremendous headache to choose a menu option and then have a tiny, non-standard weird confirmation dialog box pop up in roughly the same position where the mouse cursor was. Because the dialog box was so tiny, I often clicked outside of it, having to perform the operation again. These tiny boxes have been replaced with a standard modal Windows OK/Cancel dialog box, which also have the advantage of being able to use keyboard shortcuts (Enter or Esc) to confirm or deny the action. 
+* **Eliminate Popup Boxes:** I found it to be a tremendous headache to choose a menu option and then have a tiny, non-standard weird confirmation dialog box pop up in roughly the same position as the mouse cursor. Because the dialog box was so tiny, I often clicked outside of it (or didn't even see the it), having to perform the operation again. These tiny boxes have been replaced with standard modal Windows dialog boxes, which also have the advantage of being able to use keyboard shortcuts (Enter or Esc for OK/Cancel, Y or N for Yes/No). 
 
 * **Set Start Frame for Background Video:** If you use a video for a 3D View Background Image, you can set which frame of the project where the video begins playing. To set the keyframe, adjust the "Y" parameter to choose which Blender frame where the video should start playing. Because this uses an existing parameter, you no longer have the ability to move the video up or down, but I never used that feature and felt it was important enough to save the starting frame for the background video with the .blend file without altering the file format.
 
-* **Delete Parent Deletes All Children:** If you delete a parent object, all children (which are selectable) underneath the parent are automatically deleted. 
+* **Delete Parent Deletes All Children:** If you delete a parent object, all children (whether they are selectable or not) underneath the parent are automatically deleted. This prevents the default Blender behavior where deleting a parent object suddenly scatters all of the child elements to their alphabetical place in the Outliner, making it difficult to determine if you actually removed everything under a parent object.
 
 * **Duplicate Object Duplicates All Children:** If you press Shift+D to duplicate a parent object, all child objects are automatically duplicated as well. This prevents you from having to remember to select a parent then select all child objects and THEN run the duplicate command.
 
@@ -35,8 +35,8 @@ Here are the changes:
 
 * **Forbid Menu Collapsing:** I never liked Blender's "Collapse Menus" feature. If a window is supposed to show a menu, I believe the menu should always be shown; there shouldn't be the extra step of unhiding a menu in someone else's Blender file. So this feature has been eliminated.
 
-* **Properties Window Should Always Be Vertical:** Self-explanatory. Given what is in the Properties window and how it is organized, there is no good reason to have the ability to change it to a horizontal alignment. So this window now always has a vertical alignment.
+* **Properties Window Should Always Be Vertical:** Given what is in the Properties window and how it is organized, there is no good reason to show this window in a horizontal alignment. So this window now always has a vertical alignment.
 
-If you want some but not all of these features in your own personal fork of Blender, you're in luck. Do a search in the code for "BETTER BLENDER BEGIN" for all of the spots where I changed the code. You should be able to easily discern where the code has changed for each feature and copy-and-paste the relevant bits into your own fork.
+If you want some -- but not all -- of these features in your own personal fork of Blender, you're in luck. Do a search in the code for "BETTER BLENDER BEGIN" for all of the spots where I changed the code. You should be able to easily discern where the code has changed for each feature and copy-and-paste the relevant bits into your own fork.
 
 Enjoy!
