@@ -1,3 +1,5 @@
+**NOTE: THIS PROJECT IS OUTDATED! Blender 2.8 had a major UI overhaul and addressed nearly all of the usability issues I had with Blender 2.78c, so these enhancements are no longer necessary.**
+
 Better Blender
 ==============
 
@@ -9,7 +11,7 @@ Here are the changes:
 
 * **Obnoxious Headers:** Many of Blender's keyboard shortcuts depend on which window your mouse cursor is hovering over. Unfortunately, Blender does not make it very obvious which window your mouse cursor is hovering over, and if you have a large screen or two monitors, it's not always immediately obvious where your mouse cursor is. As a result, I've implemented "obnoxious headers" which, while not pretty, make it blatantly obvious where your mouse cursor is at all times.
 
-* **Eliminate Popup Boxes:** I found it to be a tremendous headache to choose a menu option and then have a tiny, non-standard weird confirmation dialog box pop up in roughly the same position as the mouse cursor. Because the dialog box was so tiny, I often clicked outside of it (or didn't even see the it), having to perform the operation again. These tiny boxes have been replaced with standard modal Windows dialog boxes, which also have the advantage of being able to use keyboard shortcuts (Enter or Esc for OK/Cancel, Y or N for Yes/No). 
+* **Eliminate Popup Boxes:** I found it to be a tremendous headache to choose a menu option and then have a tiny, non-standard weird confirmation dialog box pop up in roughly the same position as the mouse cursor. Because the dialog box was so tiny, I often clicked outside of it (or didn't even see it), having to perform the operation again. These tiny boxes have been replaced with standard modal Windows dialog boxes, which also have the advantage of being able to use keyboard shortcuts (Enter or Esc for OK/Cancel, Y or N for Yes/No). 
 
 * **Set Start Frame for Background Video:** If you use a video for a 3D View Background Image, you can set which frame of the project where the video begins playing. To set the keyframe, adjust the "Y" parameter to choose which Blender frame where the video should start playing. Because this uses an existing parameter, you no longer have the ability to move the video up or down, but I never used that feature and felt it was important enough to save the starting frame for the background video with the .blend file without altering the file format.
 
